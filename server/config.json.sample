@@ -1,0 +1,40 @@
+{
+    "db": {
+        "username": "root",
+        "password": "ka2p1vy1sf",
+        "database": "exemption",
+        "options": {
+            "host": "localhost",
+            "dialect": "mysql",
+            "operatorsAliases": false,
+            "pool": {
+                "max": 5,
+                "min": 0,
+                "acquire": 30000,
+                "idle": 10000
+            }
+        }
+    },
+    "smtp": {
+        "host": "smtp.yourserver.com",
+        "port": 465,
+        "secure": true,
+        "auth": {
+            "user": "username",
+            "pass": "password"
+        },
+        "from": "\"教学办公室\" <admin@yourserver.com>"
+    },
+    "jwt": {
+        "secret": "f9a7w3mv1u7",
+        "exp": 3600
+    },
+    "bcrypt": {
+        "round": 10
+    },
+    "adminList": [
+        "admin"
+    ],
+    "staticExp": 315360000000,
+    "port": 8101
+}

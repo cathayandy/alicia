@@ -1,0 +1,8 @@
+.cache
+dist
+node_modules
+.DS_Store
+students.csv
+config.json
+stats.json
+package-lock.json
