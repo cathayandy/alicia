@@ -12,8 +12,16 @@
     "load": "node server/tools/loaddata.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com:cathayandy/alicia.git"
+  },
   "author": "cathayandy",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com:cathayandy/alicia/issues"
+  },
+  "homepage": "https://github.com:cathayandy/alicia#readme",
   "dependencies": {
     "antd": "^3.25.0",
     "bcrypt": "^3.0.6",

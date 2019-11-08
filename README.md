@@ -73,7 +73,7 @@ If you serve the website using an Nginx server, you have to add a `try_files` ru
 
 ## Admin Dashboard
 
-Run `npm run load` to load initial data.
+You need to prepare student data in `server/students.csv`, following the structure in `server/students.csv.sample`. Then run `npm run load` to load initial data.
 
 Visit `/admin` to enter the admin dashboard.
 
@@ -84,7 +84,7 @@ id: admin
 name: admin
 ```
 
-You can see `server/config.json.sample` for more details.
+You can see `server/students.csv.sample` and `server/config.json.sample` for more details.
 
 ## Lisence
 
