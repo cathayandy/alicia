@@ -1,32 +1,32 @@
 module.exports = (sequelize, Sequelize) => {
     const User = sequelize.define('User', {
         id: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(50),
             allowNull: false,
             primaryKey: true,
         },
         name: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(100),
             allowNull: false,
         },
         institute: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(100),
             allowNull: false,
         },
         phone: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(50),
             allowNull: true,
         },
         email: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(100),
             allowNull: true,
         },
         reason: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(50),
             allowNull: true,
         },
         cert: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(100),
             allowNull: true,
         },
         passed: {
@@ -35,7 +35,7 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: false,
         },
         review: {
-            type: Sequelize.STRING,
+            type: Sequelize.TEXT,
             allowNull: true,
         },
     }, {
