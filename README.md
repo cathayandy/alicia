@@ -55,7 +55,7 @@ Built using [Dva.js](https://dvajs.com/), [Ant Design](https://ant.design), [Web
 
 ## Customize
 
-*   Edit `server/config.json` to customize server configs. If there's no `server/config.json`, run the app and it will copy one from `server/config.json.sample`.
+Edit `server/config.json` to customize server configs. If there's no `server/config.json`, run the app and it will copy one from `server/config.json.sample`.
 
 ## Nginx Configuration
 
