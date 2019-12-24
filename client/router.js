@@ -16,9 +16,20 @@ function RouterConfig({ history, app }) {
         ],
         component: () => import('./routes/Account'),
     });
+    const Application = dynamic({
+        app,
+        models: () => [
+            import('./models/auth'),
+            import('./models/user'),
+        ],
+        component: () => import('./routes/Application'),
+    });
     const UserAdmin = dynamic({
         app,
-        models: () => [import('./models/auth')],
+        models: () => [
+            import('./models/auth'),
+            import('./models/admin'),
+        ],
         component: () => import('./routes/admin/User'),
     });
     return (
@@ -30,6 +41,7 @@ function RouterConfig({ history, app }) {
                 />
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/account" component={Account} />
+                <Route exact path="/application" component={Application} />
                 <Route
                     exact path="/admin"
                     render={() => <Redirect to="/admin/user"/>}

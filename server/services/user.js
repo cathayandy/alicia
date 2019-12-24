@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const config = require('../config.json');
 const { User } = require('../models');
 
@@ -36,6 +37,24 @@ async function getById(ctx, id) {
 }
 
 async function updateInfo(ctx, id) {
+    if (ctx.state.jwtdata.id !== id) {
+        ctx.throw(401);
+    }
+    const { phone, email, reason, cert } = ctx.request.body;
+    const user = await User.findByPk(id);
+    if (phone !== undefined) {
+        user.phone = phone;
+    }
+    if (email !== undefined) {
+        user.email = email;
+    }
+    if (reason !== undefined) {
+        user.reason = reason;
+    }
+    if (cert !== undefined) {
+        user.cert = cert;
+    }
+    await user.save();
     ctx.body = {
         success: true,
         result: {
@@ -44,16 +63,24 @@ async function updateInfo(ctx, id) {
     };
 }
 
-async function batchPermit(ctx, id) {
+async function batchPermit(ctx) {
+    const { id: idList } = ctx.request.body;
+    await User.update(
+        { passed: true },
+        { where: { [Sequelize.Op.or]: idList.map(id => ({ id })) }}
+    );
     ctx.body = {
         success: true,
         result: {
-            id,
+            idList,
         },
     };
 }
 
 async function permit(ctx, id) {
+    const user = await User.findByPk(id);
+    user.passed = true;
+    await user.save();
     ctx.body = {
         success: true,
         result: {
@@ -62,6 +89,32 @@ async function permit(ctx, id) {
     };
 }
 
+async function reject(ctx, id) {
+    const user = await User.findByPk(id);
+    user.passed = false;
+    await user.save();
+    ctx.body = {
+        success: true,
+        result: {
+            id,
+        },
+    };
+}
+
+async function review(ctx, id) {
+    const { review } = ctx.request.body;
+    const user = await User.findByPk(id);
+    user.review = review;
+    await user.save();
+    ctx.body = {
+        success: true,
+        result: {
+            id,
+            review,
+        },
+    };
+}
+
 module.exports = {
-    getList, getById, updateInfo, batchPermit, permit,
+    getList, getById, updateInfo, batchPermit, permit, review, reject,
 };

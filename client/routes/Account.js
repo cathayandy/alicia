@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Button, Row, Col } from 'antd';
+import { Link } from 'dva/router';
+import { Button } from 'antd';
 import './Account.less';
 
 class Account extends PureComponent {
@@ -32,18 +33,15 @@ class Account extends PureComponent {
                 <p>学号：{ this.props.user.info.id }</p>
                 <p>姓名：{ this.props.user.info.name }</p>
                 <p>是否通过：{ this.props.user.info.passed ? '是' : '否' }</p>
+                <p>审核意见：{ this.props.user.info.review || '暂无' }</p>
+                <Button type="primary">
+                    <Link to="/application">上传/修改资料</Link>
+                </Button>
             </Fragment>
         );
     }
     renderLogout() {
-        return (
-            <Row>
-                <Col xs={0} sm={0}/>
-                <Col xs={4} sm={3} xxl={3}>
-                    <Button onClick={this.logout}>退出登录</Button>
-                </Col>
-            </Row>
-        );
+        return <Button onClick={this.logout}>退出登录</Button>;
     }
     render() {
         return (

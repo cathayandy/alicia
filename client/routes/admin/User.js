@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
-import { Table } from 'antd';
-import request from '../../utils/request';
+import { Table, Modal, Icon, Switch, Button } from 'antd';
+import { connect } from 'dva';
 import Admin from './Wrapper';
 
 const columns = [{
@@ -44,32 +44,122 @@ const columns = [{
     title: '审批意见',
 }];
 
-export default class UserAdmin extends PureComponent {
+class UserAdmin extends PureComponent {
     constructor(props) {
         super(props);
-        this.state = {
-            users: [],
-        };
+        this.openModal = this.openModal.bind(this);
+        this.permit = this.permit.bind(this);
+        this.batchPermit = this.batchPermit.bind(this);
+        this.onSelect = this.onSelect.bind(this);
+        this.onSelectAll = this.onSelectAll.bind(this);
     }
-    componentDidMount() {
-        request('/api/users', {
-            method: 'GET',
-        }).then(({ data }) => {
-            if (data.success) {
-                this.setState({
-                    users: data.result.list,
-                })
-            }
+    openModal(record) {
+        return () => Modal.confirm({
+            title: `免修凭证 - ${record.id}`,
+            content: <img style={{ width: '100%' }} src={`/${record.cert}`}/>,
+            okText: '通过',
+            cancelText: '返回',
+            onOk: () => this.permit(record)(true),
+            onCancel: () => {},
         });
     }
+    batchPermit() {
+        this.props.dispatch({
+            type: 'admin/batchPermit',
+        });
+    }
+    permit(record) {
+        return checked => {
+            if (checked) {
+                this.props.dispatch({
+                    type: 'admin/permit',
+                    payload: {
+                        id: record.id,
+                    },
+                });
+            } else {
+                this.props.dispatch({
+                    type: 'admin/reject',
+                    payload: {
+                        id: record.id,
+                    },
+                });
+            }
+        }
+    }
+    onSelect(record, selected) {
+        if (selected) {
+            this.props.dispatch({
+                type: 'admin/select',
+                payload: {
+                    list: [record.id],
+                },
+            });
+        } else {
+            this.props.dispatch({
+                type: 'admin/unselect',
+                payload: {
+                    list: [record.id],
+                },
+            });
+        }
+    }
+    onSelectAll(selected, _selectedRows, changeRows) {
+        if (selected) {
+            this.props.dispatch({
+                type: 'admin/select',
+                payload: {
+                    list: changeRows.map(row => row.id),
+                },
+            });
+        } else {
+            this.props.dispatch({
+                type: 'admin/unselect',
+                payload: {
+                    list: changeRows.map(row => row.id),
+                },
+            });
+        }
+    }
     render() {
+        columns[6].render = (_text, record) => {
+            return <a onClick={this.openModal(record)}><Icon type="eye" /></a>;
+        };
+        columns[7].render = (_text, record) => {
+            return (
+                <Switch
+                    size="small"
+                    checked={record.passed}
+                    onChange={this.permit(record)}
+                    loading={this.props.admin.permitLoading.has(record.id)}
+                />
+            );
+        };
+        columns[8].render = (_text, _record) => {
+            return <Icon type="edit" />;
+        };
+        const rowSelection = {
+            onSelect: this.onSelect,
+            onSelectAll: this.onSelectAll,
+            selectedRowKeys: [...this.props.admin.selected.values()],
+        };
         return (
             <Admin>
                 <Table
-                    rowKey="id" columns={columns}
-                    dataSource={this.state.users}
+                    size="middle" rowKey="id" columns={columns}
+                    rowSelection={rowSelection}
+                    dataSource={this.props.admin.users}
                 />
+                <Button
+                    style={{ marginTop: '-45px', float: 'left' }}
+                    onClick={this.batchPermit}
+                    type="primary"
+                >
+                    全部通过
+                </Button>
             </Admin>
         );
     }
 }
+
+export default connect(({ admin }) => ({ admin }))(UserAdmin);

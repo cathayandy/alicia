@@ -41,6 +41,15 @@ app.use(async (ctx, next) => {
         })(ctx, next);
     }
 });
+app.use(async (ctx, next) => {
+    if (ctx.request.path.startsWith('/api')) {
+        await next();
+    } else {
+        await serve('./server/uploads/', {
+            maxage: config.staticExp,
+        })(ctx, next);
+    }
+});
 // auth
 app.use(auth.errWrapper);
 app.use(route.post('/api/login', auth.login));
@@ -50,25 +59,30 @@ app.use(jwt({ secret: config.jwt.secret, key: 'jwtdata' }));
 app.use(route.post('/api/verify', auth.verify));
 app.use(route.get('/api/users/:id', user.getById));
 app.use(route.patch('/api/users/:id', user.updateInfo));
-// admin guard
-app.use(auth.checkAdmin);
-// admin routes
 // upload
 const storage = multer.diskStorage({
     destination(_req, _file, cb) {
-        cb(null, 'server/uploads/');
+        cb(null, './server/uploads/');
     },
     filename(_req, file, cb) {
-        cb(null, `${file.fieldname}.${new Date().valueOf()}.png`);
+        console.log(file);
+        cb(null, `${file.fieldname}`);
     },
 });
 const upload = multer({ storage });
-app.use(route.post('/api/upload/cert', upload.single('cert')));
 app.use(route.post('/api/upload/cert', async ctx => {
-    ctx.body = '{"success":true}';
+    await upload.single(`cert.${ctx.state.jwtdata.id}`)(ctx);
+    ctx.body = {
+        success: true,
+    };
 }));
+// admin guard
+app.use(auth.checkAdmin);
+// admin routes
 app.use(route.get('/api/users', user.getList));
 app.use(route.post('/api/users/permission', user.batchPermit));
 app.use(route.post('/api/users/:id/permission', user.permit));
+app.use(route.delete('/api/users/:id/permission', user.reject));
+app.use(route.post('/api/users/:id/review', user.review));
 // response
 app.listen(config.port);

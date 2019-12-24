@@ -1,3 +1,4 @@
+import { routerRedux } from 'dva/router';
 import request from '../utils/request';
 
 async function getById() {
@@ -8,10 +9,27 @@ async function getById() {
     return request(`/api/users/${encodeURIComponent(id)}`);
 }
 
+async function updateInfo(params) {
+    const id = localStorage.getItem('id');
+    if (!id) {
+        return Promise.reject('Not login');
+    }
+    const body = Object.keys(params).map(k => `${k}=${params[k]}`).join('&');
+    return request(`/api/users/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        body,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+        },
+    });
+}
+
 export default {
     namespace: 'user',
     state: {
         userLoading: false,
+        updateLoading: false,
         info: {
             id: '',
             name: '',
@@ -33,7 +51,8 @@ export default {
         },
     },
     effects: {
-        *getById(_, { put, call }) {
+        *getById(_, { call, put: _put }) {
+            const put = _put.resolve;
             yield put({ type: 'save', payload: { userLoading: true } });
             try {
                 const { data, err } = yield call(getById);
@@ -53,6 +72,29 @@ export default {
                 console.error(err);
             }
             yield put({ type: 'save', payload: { userLoading: false } });
+        },
+        *updateInfo({ payload }, { call, put: _put }) {
+            const put = _put.resolve;
+            yield put({ type: 'save', payload: { updateLoading: true } });
+            try {
+                const { data, err } = yield call(updateInfo, payload);
+                if (!err && data.success) {
+                    yield put({
+                        type: 'save',
+                        payload: {
+                            info: {
+                                ...data.result
+                            },    
+                        },
+                    });
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            yield put({ type: 'save', payload: { updateLoading: false } });
+            yield put(routerRedux.push({ pathname: '/account' }));
         },
     },
 };

@@ -4,7 +4,7 @@ import request from '../utils/request';
 
 const enterRoutes = [/^\/login/];
 const adminRoutes = [/^\/admin/];
-const userRoutes = [/^\/account/];
+const userRoutes = [/^\/account/, /^\/application/];
 
 function testEnter(route) {
     return enterRoutes.reduce((prev, cur) => prev || cur.test(route), false);
@@ -59,7 +59,8 @@ export default {
         },
     },
     effects: {
-        *verify({ payload }, { call, put }) {
+        *verify({ payload }, { call, put: _put }) {
+            const put = _put.resolve;
             const { pathname } = payload;
             yield put({ type: 'save', payload: { loading: true } });
             const { data, err } = yield call(verify);
@@ -81,7 +82,8 @@ export default {
                 console.error(err);
             }
         },
-        *login({ payload }, { put, call }) {
+        *login({ payload }, { call, put: _put }) {
+            const put = _put.resolve;
             yield put({ type: 'save', payload: { loading: true } });
             const { data, err } = yield call(login, payload);
             yield put({ type: 'save', payload: { loading: false } });
@@ -100,7 +102,8 @@ export default {
                 }
             }
         },
-        *logout(_, { put }) {
+        *logout(_, { put: _put }) {
+            const put = _put.resolve;
             yield put({ type: 'save', payload: { loading: true } });
             localStorage.removeItem('id');
             localStorage.removeItem('token');
