@@ -1,6 +1,6 @@
 {
   "name": "alicia",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An exemption application platform",
   "main": "server/app.js",
   "scripts": {
