@@ -98,7 +98,7 @@ export default {
             } else {
                 message.error('Login failed');
                 if (err) {
-                    console.log(err);
+                    console.error(err);
                 }
             }
         },

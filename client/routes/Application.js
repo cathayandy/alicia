@@ -33,9 +33,6 @@ class Application extends PureComponent {
         }
     }
     onCertChange({ file, fileList, event }) {
-        console.log(file);
-        console.log(fileList);
-        console.log(event);
         if (file.status === 'done' || file.status === 'uploading') {
             if ((this.state.fileList[0] || {}).uid !== file.uid) {
                 this.setState({ fileList: [file] });
