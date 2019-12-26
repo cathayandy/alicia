@@ -83,7 +83,7 @@ export default {
         setupHistory({ dispatch, history }) {
             history.listen(() => {
                 dispatch({
-                    type: 'admin/getUserList',
+                    type: 'getUserList',
                 });
             });
         },
@@ -214,6 +214,39 @@ export default {
                 console.error(err);
             }
             yield put({ type: 'save', payload: { listLoading: false } });
+        },
+        *review({ payload }, { call, put: _put }) {
+            if (payload.id === undefined) {
+                console.error('UserId is required');
+                return;
+            }
+            const put = _put.resolve;
+            yield put({
+                type: 'addSet',
+                payload: {
+                    setName: 'reviewLoading',
+                    el: payload.id,
+                },
+            });
+            try {
+                const { data, err } = yield call(review, payload);
+                if (!err && data.success) {
+                    yield put({
+                        type: 'getUserList',
+                    });
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            yield put({
+                type: 'delSet',
+                payload: {
+                    setName: 'reviewLoading',
+                    el: payload.id,
+                },
+            });
         },
     },
 };

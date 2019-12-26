@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react';
-import { Table, Modal, Icon, Switch, Button } from 'antd';
+import { Table, Modal, Icon, Switch, Button, Select } from 'antd';
 import { connect } from 'dva';
 import Admin from './Wrapper';
+
+const Option = Select.Option;
 
 const columns = [{
     key: 'id',
@@ -49,6 +51,7 @@ class UserAdmin extends PureComponent {
         super(props);
         this.openModal = this.openModal.bind(this);
         this.permit = this.permit.bind(this);
+        this.review = this.review.bind(this);
         this.batchPermit = this.batchPermit.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onSelectAll = this.onSelectAll.bind(this);
@@ -85,6 +88,17 @@ class UserAdmin extends PureComponent {
                     },
                 });
             }
+        }
+    }
+    review(record) {
+        return value => {
+            this.props.dispatch({
+                type: 'admin/review',
+                payload: {
+                    id: record.id,
+                    review: value,
+                },
+            });
         }
     }
     onSelect(record, selected) {
@@ -135,8 +149,22 @@ class UserAdmin extends PureComponent {
                 />
             );
         };
-        columns[8].render = (_text, _record) => {
-            return <Icon type="edit" />;
+        columns[8].render = (_text, record) => {
+            return (
+                <Select
+                    size="small"
+                    style={{ width: 150 }}
+                    placeholder="选择反馈"
+                    value={record.review}
+                    onChange={this.review(record)}
+                >
+                    <Option value="">暂无</Option>
+                    <Option value="file-broken">证明文件损坏</Option>
+                    <Option value="unmatch">类别与证明文件不符</Option>
+                    <Option value="disqualified">未达到要求</Option>
+                    <Option value="invalid-phone">手机无法接通</Option>
+                </Select>
+            );
         };
         const rowSelection = {
             onSelect: this.onSelect,
