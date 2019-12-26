@@ -1,12 +1,18 @@
 import fetch from 'dva/fetch';
 
-function checkStatus(response) {
-    if (response.status >= 200 && response.status < 300) {
-        return response;
+async function handleResponse(res) {
+    const status = res.status;
+    let data;
+    try {
+        data = await res.json();
+    } catch (err) {
+        data = res.statusText;
     }
-    const error = new Error(response.statusText);
-    error.response = response;
-    throw error;
+    if (status >= 200 && status < 300) {
+        return { data };
+    } else {
+        return { err: data };
+    }
 }
 
 /**
@@ -23,8 +29,5 @@ export default function request(url, options={}) {
         options.headers.Authorization = `Bearer ${token}`;
     }
     return fetch(url, { credentials: 'include', ...options })
-        .then(checkStatus)
-        .then(res => res.json())
-        .then(data => ({ data }))
-        .catch(err => ({ err }));
+        .then(handleResponse)
 }

@@ -37,3 +37,15 @@ export function reqAll(ctx) {
     const keys = ctx.keys().map(k => k.slice(2));
     return keys.reduce((prev, cur, i) => (prev[cur] = values[i]) && prev, {});
 }
+
+export const reviewMap = {
+    'file-broken': '证明文件损坏',
+    'unmatch': '类别与证明文件不符',
+    'disqualified': '未达到要求',
+    'invalid-phone': '手机无法接通',
+};
+
+export const errMap = {
+    'Not Found': '没有此用户',
+    'Not Match': '您的学号和用户名不匹配',
+};

@@ -32,6 +32,7 @@ async function getById(ctx, id) {
             id: result.id,
             name: result.name,
             passed: result.passed,
+            review: result.review,
         },
     };
 }

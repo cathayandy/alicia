@@ -98,7 +98,7 @@ class Application extends PureComponent {
                             </Select>
                         )
                     }</FormItem>
-                    <FormItem hasFeedback>{
+                    <FormItem>{
                         getFieldDecorator('cert', {
                             rules: [{
                                 required: true,

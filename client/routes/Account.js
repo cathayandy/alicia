@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
 import { Button } from 'antd';
+import { reviewMap } from '../utils';
 import './Account.less';
 
 class Account extends PureComponent {
@@ -25,15 +26,16 @@ class Account extends PureComponent {
         });
     }
     renderInfo() {
+        const { id, name, passed, review } = this.props.user.info;
         return (
             <Fragment>
                 <div className="account-header">
                     <h3>您的信息</h3>
                 </div>
-                <p>学号：{ this.props.user.info.id }</p>
-                <p>姓名：{ this.props.user.info.name }</p>
-                <p>是否通过：{ this.props.user.info.passed ? '是' : '否' }</p>
-                <p>审核意见：{ this.props.user.info.review || '暂无' }</p>
+                <p>学号：{ id }</p>
+                <p>姓名：{ name }</p>
+                <p>是否通过：{ passed ? '是' : '否' }</p>
+                <p>审核意见：{ reviewMap[review] || '暂无' }</p>
                 <Button type="primary">
                     <Link to="/application">上传/修改资料</Link>
                 </Button>

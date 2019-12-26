@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Table, Modal, Icon, Switch, Button, Select } from 'antd';
 import { connect } from 'dva';
 import Admin from './Wrapper';
+import { reviewMap } from '../../utils';
 
 const Option = Select.Option;
 
@@ -149,6 +150,9 @@ class UserAdmin extends PureComponent {
                 />
             );
         };
+        const options = Object.keys(reviewMap).map(
+            k => <Option key={k} value={k}>{ reviewMap[k] }</Option>
+        );
         columns[8].render = (_text, record) => {
             return (
                 <Select
@@ -159,10 +163,7 @@ class UserAdmin extends PureComponent {
                     onChange={this.review(record)}
                 >
                     <Option value="">暂无</Option>
-                    <Option value="file-broken">证明文件损坏</Option>
-                    <Option value="unmatch">类别与证明文件不符</Option>
-                    <Option value="disqualified">未达到要求</Option>
-                    <Option value="invalid-phone">手机无法接通</Option>
+                    { options }
                 </Select>
             );
         };

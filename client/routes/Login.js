@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Button, Form, Input, Icon } from 'antd';
+import { Button, Form, Input, Icon, Alert } from 'antd';
+import { errMap } from '../utils';
 import './Login.less';
 
 const FormItem = Form.Item;
@@ -16,7 +17,16 @@ class Login extends PureComponent {
         });
     }
     render() {
-        const { auth: { loading }, form: { getFieldDecorator } } = this.props;
+        const {
+            auth: { loginLoading, loginError },
+            form: { getFieldDecorator },
+        } = this.props;
+        const errHint = loginError ?
+            <Alert
+                message={errMap[loginError] || '登录错误'}
+                type="error"
+                banner
+            /> : undefined;
         return (
             <div className="login-form">
                 <div className="login-header">
@@ -53,11 +63,11 @@ class Login extends PureComponent {
                         <Button
                             type="primary"
                             onClick={() => this.handleOk()}
-                            loading={loading}
-
+                            loading={loginLoading}
                         >
                             登录
                         </Button>
+                        { errHint }
                     </FormItem>
                 </form>
             </div>

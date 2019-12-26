@@ -17,12 +17,17 @@ async function errWrapper(ctx, next) {
 async function login(ctx) {
     const { id, name } = ctx.request.body;
     const user = await User.findOne({
-        where: { id, name },
+        where: { id },
     });
     if (!user) {
-        ctx.throw(401);
+        ctx.body = {
+            success: false,
+            info: 'Not Found',
+        };
+        ctx.status = 401;
+        return;
     }
-    const match = true; // await bcrypt.compare(password, user.password);
+    const match = name === user.name; // await bcrypt.compare(password, user.password);
     if (match) {
         const role = config.adminList.find(v => v === id) ?
             'admin' : 'user';
@@ -36,7 +41,12 @@ async function login(ctx) {
             }, config.jwt.secret),
         };
     } else {
-        ctx.throw(401);
+        ctx.body = {
+            success: false,
+            info: 'Not Match',
+        };
+        ctx.status = 401;
+        return;
     }
 }
 
