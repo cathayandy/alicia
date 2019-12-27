@@ -89,15 +89,18 @@ class Application extends PureComponent {
                             }],
                         })(
                             <Select
-                                placeholder="请选择您的免修类型"
+                                placeholder="请选择您的免修类别"
                                 onPressEnter={() => this.handleOk()}
                             >
                                 <Option value="toefl">托福</Option>
-                                <Option value="cet4">大学英语四级</Option>
+                                <Option value="ielts">雅思</Option>
+                                <Option value="gmat">GMAT</Option>
+                                <Option value="gre">GRE</Option>
                                 <Option value="cet6">大学英语六级</Option>
                             </Select>
                         )
                     }</FormItem>
+                    // todo: 填写分数，判断分数是否符合免修要求
                     <FormItem>{
                         getFieldDecorator('cert', {
                             rules: [{

@@ -29,7 +29,7 @@ const columns = [{
 }, {
     key: 'reason',
     dataIndex: 'reason',
-    title: '免修原因',
+    title: '免修类别',
 }, {
     key: 'cert',
     dataIndex: 'cert',
@@ -137,6 +137,7 @@ class UserAdmin extends PureComponent {
         }
     }
     render() {
+        // todo: 免修类型显示为('雅思','托福','GMAT','GRE','英语六级')
         columns[6].render = (_text, record) => {
             return <a onClick={this.openModal(record)}><Icon type="eye" /></a>;
         };

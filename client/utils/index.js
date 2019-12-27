@@ -39,10 +39,11 @@ export function reqAll(ctx) {
 }
 
 export const reviewMap = {
-    'file-broken': '证明文件损坏',
-    'unmatch': '类别与证明文件不符',
-    'disqualified': '未达到要求',
-    'invalid-phone': '手机无法接通',
+    'file-broken': '证明文件损坏/无法打开',
+    'file-blur': '证明文件模糊/无法辨认',
+    'unmatch': '免修类别与证明文件不符',
+    // 'disqualified': '未达到要求',
+    // 'invalid-phone': '手机无法接通',
 };
 
 export const errMap = {
