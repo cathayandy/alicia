@@ -25,6 +25,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(50),
             allowNull: true,
         },
+        score: {
+            type: Sequelize.DOUBLE,
+            allowNull: true,
+        },
         cert: {
             type: Sequelize.STRING(100),
             allowNull: true,

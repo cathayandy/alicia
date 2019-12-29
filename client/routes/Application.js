@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
-import { Button, Form, Input, Select, Upload, Icon } from 'antd';
+import { Button, Form, Input, InputNumber, Select, Upload, Icon } from 'antd';
+import { certTypeMap } from '../utils';
 import './Application.less';
 
 const FormItem = Form.Item;
@@ -50,6 +51,9 @@ class Application extends PureComponent {
         const token = localStorage.getItem('token');
         const headers = token ?
             { Authorization: `Bearer ${token}` } : undefined;
+        const options = Object.keys(certTypeMap).map(
+            k => <Option key={k} value={k}>{ certTypeMap[k] }</Option>
+        );
         return (
             <div className="app-form">
                 <div className="app-header">
@@ -92,15 +96,23 @@ class Application extends PureComponent {
                                 placeholder="请选择您的免修类别"
                                 onPressEnter={() => this.handleOk()}
                             >
-                                <Option value="toefl">托福</Option>
-                                <Option value="ielts">雅思</Option>
-                                <Option value="gmat">GMAT</Option>
-                                <Option value="gre">GRE</Option>
-                                <Option value="cet6">大学英语六级</Option>
+                                { options }
                             </Select>
                         )
                     }</FormItem>
-                    // todo: 填写分数，判断分数是否符合免修要求
+                    <FormItem hasFeedback>{
+                        getFieldDecorator('score', {
+                            rules: [{
+                                required: true,
+                            }],
+                        })(
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                placeholder="请填写您的分数"
+                                onPressEnter={() => this.handleOk()}
+                            />
+                        )
+                    }</FormItem>
                     <FormItem>{
                         getFieldDecorator('cert', {
                             rules: [{

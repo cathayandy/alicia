@@ -62,12 +62,12 @@ async function batchPermit(idList) {
     });
 }
 
-async function getUserList() {
+async function getUserList({ pagination: { pageSize=10, current=0 }}) {
     const adminId = localStorage.getItem('id');
     if (!adminId) {
         return Promise.reject('Not login');
     }
-    return request('/api/users');
+    return request(`/api/users?size=${pageSize}&page=${current}`);
 }
 
 export default {
@@ -77,13 +77,32 @@ export default {
         reviewLoading: new Set(),
         listLoading: false,
         users: [],
+        pagination: {
+            pageSize: 10,
+            current: 0,
+        },
         selected: new Set(),
     },
     subscriptions: {
         setupHistory({ dispatch, history }) {
-            history.listen(() => {
+            history.listen(({ search }) => {
+                let current = 0;
+                if (search.length > 0) {
+                    const arr = search.split('?');
+                    if (arr.length > 1) {
+                        const q = arr[1].split('&').map(q => q.split('='));
+                        const [_, p] = q.find(([k, _v]) => k === 'page');
+                        current = +p;
+                    }
+                }
                 dispatch({
                     type: 'getUserList',
+                    payload: {
+                        pagination: {
+                            pageSize: 10,
+                            current,
+                        },
+                    },
                 });
             });
         },
@@ -110,16 +129,20 @@ export default {
         },
     },
     effects: {
-        *getUserList(_, { call, put: _put }) {
+        *getUserList({ payload }, { call, put: _put }) {
             const put = _put.resolve;
             yield put({ type: 'save', payload: { listLoading: true } });
             try {
-                const { data, err } = yield call(getUserList);
+                const { data, err } = yield call(getUserList, payload);
                 if (!err && data.success) {
                     yield put({
                         type: 'save',
                         payload: {
                             users: data.result.list,    
+                            pagination: {
+                                ...payload.pagination,
+                                total: data.result.total,
+                            },
                         },
                     });
                 } else if (err) {
@@ -130,7 +153,7 @@ export default {
             }
             yield put({ type: 'save', payload: { listLoading: false } });
         },
-        *permit({ payload }, { call, put: _put }) {
+        *permit({ payload }, { call, put: _put, select }) {
             if (payload.id === undefined) {
                 console.error('UserId is required');
                 return;
@@ -146,8 +169,12 @@ export default {
             try {
                 const { data, err } = yield call(permit, payload);
                 if (!err && data.success) {
+                    const pagination = yield select(
+                        state => state.admin.pagination
+                    );
                     yield put({
                         type: 'getUserList',
+                        payload: { pagination },
                     });
                 } else if (err) {
                     console.error(err);
@@ -163,7 +190,7 @@ export default {
                 },
             });
         },
-        *reject({ payload }, { call, put: _put }) {
+        *reject({ payload }, { call, put: _put, select }) {
             if (payload.id === undefined) {
                 console.error('UserId is required');
                 return;
@@ -179,8 +206,12 @@ export default {
             try {
                 const { data, err } = yield call(reject, payload);
                 if (!err && data.success) {
+                    const pagination = yield select(
+                        state => state.admin.pagination
+                    );
                     yield put({
                         type: 'getUserList',
+                        payload: { pagination },
                     });
                 } else if (err) {
                     console.error(err);
@@ -204,8 +235,12 @@ export default {
             try {
                 const { data, err } = yield call(batchPermit, idList);
                 if (!err && data.success) {
+                    const pagination = yield select(
+                        state => state.admin.pagination
+                    );
                     yield put({
                         type: 'getUserList',
+                        payload: { pagination },
                     });
                 } else if (err) {
                     console.error(err);
@@ -215,7 +250,7 @@ export default {
             }
             yield put({ type: 'save', payload: { listLoading: false } });
         },
-        *review({ payload }, { call, put: _put }) {
+        *review({ payload }, { call, put: _put, select }) {
             if (payload.id === undefined) {
                 console.error('UserId is required');
                 return;
@@ -231,8 +266,12 @@ export default {
             try {
                 const { data, err } = yield call(review, payload);
                 if (!err && data.success) {
+                    const pagination = yield select(
+                        state => state.admin.pagination
+                    );
                     yield put({
                         type: 'getUserList',
+                        payload: { pagination },
                     });
                 } else if (err) {
                     console.error(err);

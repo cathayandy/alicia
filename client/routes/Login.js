@@ -30,7 +30,7 @@ class Login extends PureComponent {
         return (
             <div className="login-form">
                 <div className="login-header">
-                    <h3>免修申请平台 - 请登录</h3>
+                    <h3>英语水平考试免修申请平台</h3>
                 </div>
                 <form>
                     <FormItem hasFeedback>{

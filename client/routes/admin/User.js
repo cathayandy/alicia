@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react';
 import { Table, Modal, Icon, Switch, Button, Select } from 'antd';
 import { connect } from 'dva';
+import { routerRedux } from 'dva/router';
 import Admin from './Wrapper';
-import { reviewMap } from '../../utils';
+import { reviewMap, certTypeMap } from '../../utils';
 
 const Option = Select.Option;
 
@@ -30,6 +31,13 @@ const columns = [{
     key: 'reason',
     dataIndex: 'reason',
     title: '免修类别',
+    render: (_text, record) => {
+        return certTypeMap[record.reason] || record.reason;
+    }
+}, {
+    key: 'score',
+    dataIndex: 'score',
+    title: '成绩',
 }, {
     key: 'cert',
     dataIndex: 'cert',
@@ -56,6 +64,7 @@ class UserAdmin extends PureComponent {
         this.batchPermit = this.batchPermit.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onSelectAll = this.onSelectAll.bind(this);
+        this.onChange = this.onChange.bind(this);
     }
     openModal(record) {
         return () => Modal.confirm({
@@ -136,12 +145,16 @@ class UserAdmin extends PureComponent {
             });
         }
     }
+    onChange(pagination) {
+        this.props.dispatch(
+            routerRedux.push(`/admin/user?page=${pagination.current}`
+        ));
+    }
     render() {
-        // todo: 免修类型显示为('雅思','托福','GMAT','GRE','英语六级')
-        columns[6].render = (_text, record) => {
+        columns[7].render = (_text, record) => {
             return <a onClick={this.openModal(record)}><Icon type="eye" /></a>;
         };
-        columns[7].render = (_text, record) => {
+        columns[8].render = (_text, record) => {
             return (
                 <Switch
                     size="small"
@@ -154,7 +167,7 @@ class UserAdmin extends PureComponent {
         const options = Object.keys(reviewMap).map(
             k => <Option key={k} value={k}>{ reviewMap[k] }</Option>
         );
-        columns[8].render = (_text, record) => {
+        columns[9].render = (_text, record) => {
             return (
                 <Select
                     size="small"
@@ -178,7 +191,10 @@ class UserAdmin extends PureComponent {
                 <Table
                     size="middle" rowKey="id" columns={columns}
                     rowSelection={rowSelection}
+                    pagination={this.props.admin.pagination}
                     dataSource={this.props.admin.users}
+                    onChange={this.onChange}
+                    loading={this.props.admin.listLoading}
                 />
                 <Button
                     style={{ marginTop: '-45px', float: 'left' }}

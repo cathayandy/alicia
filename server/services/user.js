@@ -3,13 +3,13 @@ const config = require('../config.json');
 const { User } = require('../models');
 
 async function getList(ctx) {
-    const { page=0, size=50 } = ctx.request.query;
+    const { page=1, size=10 } = ctx.request.query;
     const { rows, count } = await User.findAndCountAll({
-        offset: page * size,
-        limit: size,
+        offset: (page - 1) * +size,
+        limit: +size,
         attributes: [
             'createdAt', 'id', 'name', 'institute', 'phone',
-            'email', 'reason', 'cert', 'passed', 'review',
+            'email', 'reason', 'score', 'cert', 'passed', 'review',
         ],
     });
     ctx.body = {
@@ -41,7 +41,7 @@ async function updateInfo(ctx, id) {
     if (ctx.state.jwtdata.id !== id) {
         ctx.throw(401);
     }
-    const { phone, email, reason, cert } = ctx.request.body;
+    const { phone, email, reason, score, cert } = ctx.request.body;
     const user = await User.findByPk(id);
     if (phone !== undefined) {
         user.phone = phone;
@@ -51,6 +51,9 @@ async function updateInfo(ctx, id) {
     }
     if (reason !== undefined) {
         user.reason = reason;
+    }
+    if (score !== undefined) {
+        user.score = score;
     }
     if (cert !== undefined) {
         user.cert = cert;

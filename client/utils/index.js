@@ -50,3 +50,11 @@ export const errMap = {
     'Not Found': '没有此用户',
     'Not Match': '您的学号和用户名不匹配',
 };
+
+export const certTypeMap = {
+    toefl: '托福',
+    ielts: '雅思',
+    gmat: 'GMAT',
+    gre: 'GRE',
+    cet6: '大学英语六级',
+};
