@@ -1,13 +1,18 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
-import { Button, Form, Input, InputNumber, Select, Upload, Icon } from 'antd';
+import {
+    Button, Form, Input, InputNumber,
+    Select, Upload, Icon, Tooltip, Row, Col
+} from 'antd';
 import { certTypeMap } from '../utils';
 import './Application.less';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
 const Dragger = Upload.Dragger;
+
+const gradeRule = '托福95分（含）以上；雅思6.5（含）以上；GMAT650分（含）以上（作文5分以上）；GRE文字推理（新制）145分（含）以上；英语六级600分（含）以上';
 
 class Application extends PureComponent {
     constructor(props) {
@@ -33,7 +38,7 @@ class Application extends PureComponent {
             return `cert.${id}`;
         }
     }
-    onCertChange({ file, fileList, event }) {
+    onCertChange({ file }) {
         if (file.status === 'done' || file.status === 'uploading') {
             if ((this.state.fileList[0] || {}).uid !== file.uid) {
                 this.setState({ fileList: [file] });
@@ -54,6 +59,11 @@ class Application extends PureComponent {
         const options = Object.keys(certTypeMap).map(
             k => <Option key={k} value={k}>{ certTypeMap[k] }</Option>
         );
+        const tooltip = (
+            <Tooltip title={gradeRule}>
+                <Icon type="question-circle-o" />
+            </Tooltip>
+        );
         return (
             <div className="app-form">
                 <div className="app-header">
@@ -63,12 +73,13 @@ class Application extends PureComponent {
                     <FormItem hasFeedback>{
                         getFieldDecorator('phone', {
                             rules: [{
-                                required: true,
+                                pattern: /^1((3|4|5|7|8)\d{0,9})?$/,
+                                message: '手机号不合法',
                             }],
                         })(
                             <Input
                                 prefix={<Icon type="mobile" />}
-                                placeholder="请输入您的手机"
+                                placeholder="请输入您的手机，选填"
                                 onPressEnter={() => this.handleOk()}
                             />
                         )
@@ -90,6 +101,7 @@ class Application extends PureComponent {
                         getFieldDecorator('reason', {
                             rules: [{
                                 required: true,
+                                message: '免修类别不能为空',
                             }],
                         })(
                             <Select
@@ -100,23 +112,37 @@ class Application extends PureComponent {
                             </Select>
                         )
                     }</FormItem>
-                    <FormItem hasFeedback>{
-                        getFieldDecorator('score', {
-                            rules: [{
-                                required: true,
-                            }],
-                        })(
-                            <InputNumber
-                                style={{ width: '100%' }}
-                                placeholder="请填写您的分数"
-                                onPressEnter={() => this.handleOk()}
-                            />
-                        )
-                    }</FormItem>
+                    <Row type="flex" justify="space-between" align="middle">
+                        <Col span={21}>
+                            <FormItem hasFeedback>{
+                                getFieldDecorator('score', {
+                                    rules: [{
+                                        required: true,
+                                        message: '分数不能为空',
+                                    }],
+                                })(
+                                
+                                    <InputNumber
+                                        style={{ width: '100%' }}
+                                        placeholder="请填写您的分数"
+                                        onPressEnter={() => this.handleOk()}
+                                    />
+                                )
+                            }</FormItem>
+                        </Col>
+                        <Col span={1}>
+                        </Col>
+                        <Col span={2}>
+                            <FormItem>
+                                { tooltip }
+                            </FormItem>
+                        </Col>
+                    </Row>
                     <FormItem>{
                         getFieldDecorator('cert', {
                             rules: [{
                                 required: true,
+                                message: '免修凭证不能为空',
                             }],
                             getValueFromEvent: this.normFile,
                         })(
@@ -125,6 +151,7 @@ class Application extends PureComponent {
                                 multiple={false}
                                 action="/api/upload/cert"
                                 listType="picture"
+                                accept="image/*"
                                 headers={headers}
                                 fileList={this.state.fileList}
                                 onChange={this.onCertChange}
@@ -134,6 +161,9 @@ class Application extends PureComponent {
                                 </p>
                                 <p className="ant-upload-text">
                                     请上传您的免修凭证
+                                </p>
+                                <p className="ant-upload-hint">
+                                    申请人须保证上传材料的真实性
                                 </p>
                             </Dragger>
                         )

@@ -119,6 +119,22 @@ async function review(ctx, id) {
     };
 }
 
+async function exportList(ctx) {
+    const users = await User.findAll({
+        attributes: [
+            'id', 'name', 'institute', 'phone',
+            'email', 'reason', 'score', 'passed',
+        ],
+    });
+    ctx.body = {
+        success: true,
+        result: {
+            list: users,
+        },
+    };
+}
+
 module.exports = {
-    getList, getById, updateInfo, batchPermit, permit, review, reject,
+    getList, getById, updateInfo, batchPermit,
+    permit, review, reject, exportList,
 };

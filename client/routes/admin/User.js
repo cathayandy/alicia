@@ -196,13 +196,26 @@ class UserAdmin extends PureComponent {
                     onChange={this.onChange}
                     loading={this.props.admin.listLoading}
                 />
-                <Button
-                    style={{ marginTop: '-45px', float: 'left' }}
-                    onClick={this.batchPermit}
-                    type="primary"
-                >
-                    全部通过
-                </Button>
+                <div style={{ marginTop: '-45px', float: 'left' }}>
+                    <Button
+                        style={{ marginRight: '5px' }}
+                        onClick={this.batchPermit}
+                        type="primary"
+                    >
+                        通过所有选中用户
+                    </Button>
+                    <Button
+                        icon="download"
+                        style={{ marginRight: '5px' }}
+                    >
+                        导出所有已申请用户信息
+                    </Button>
+                    <Button
+                        icon="notification"
+                    >
+                        邮件通知所有已申请用户
+                    </Button>
+                </div>
             </Admin>
         );
     }

@@ -79,14 +79,14 @@ export default {
         users: [],
         pagination: {
             pageSize: 10,
-            current: 0,
+            current: 1,
         },
         selected: new Set(),
     },
     subscriptions: {
         setupHistory({ dispatch, history }) {
             history.listen(({ search }) => {
-                let current = 0;
+                let current = 1;
                 if (search.length > 0) {
                     const arr = search.split('?');
                     if (arr.length > 1) {
