@@ -1,16 +1,23 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Link } from 'dva/router';
-import { Button, Form, Input, Icon, Alert } from 'antd';
+import { Alert, Button, Form, Input, Icon } from 'antd';
 import { errMap } from '../utils';
-import './Login.less';
+import './Verification.less';
 
 const FormItem = Form.Item;
 
-class Login extends PureComponent {
+const hint = '请填写您的清华学号和姓名，作为身份认证。一旦认证通过，您的身份信息将不可修改，请如实填写，谢谢！';
+
+class Verification extends PureComponent {
     constructor(props) {
         super(props);
         this.handleOk = this.handleOk.bind(this);
+        this.logout = this.logout.bind(this);
+    }
+    logout() {
+        this.props.dispatch({
+            type: 'user/logout',
+        });
     }
     handleOk() {
         const { form: { validateFieldsAndScroll }, dispatch } = this.props;
@@ -18,68 +25,68 @@ class Login extends PureComponent {
             if (errors) {
                 return;
             }
-            dispatch({ type: 'auth/login', payload: values });
+            dispatch({ type: 'user/updateInfo', payload: values });
         });
     }
     render() {
         const {
-            auth: { loginLoading, loginError },
+            user: { updateLoading, verificationError },
             form: { getFieldDecorator },
         } = this.props;
-        const errHint = loginError ?
+        const errHint = verificationError ?
             <Alert
-                message={errMap[loginError] || '登录错误'}
+                message={errMap[verificationError] || '认证失败'}
                 type="error"
                 banner
             /> : undefined;
         return (
-            <div className="login-form">
-                <div className="login-header">
-                    <h3>英语水平考试免修申请平台</h3>
+            <div className="verification-form">
+                <div className="verification-header">
+                    <h3>身份认证</h3>
                 </div>
                 <form>
+                    <FormItem>
+                        <Alert banner message={hint} type="info" />
+                    </FormItem>
                     <FormItem hasFeedback>{
-                        getFieldDecorator('email', {
+                        getFieldDecorator('studentId', {
                             rules: [{
                                 required: true,
-                                message: '邮箱不能为空',
+                                message: '学号不能为空',
                             }],
                         })(
                             <Input
-                                prefix={<Icon type="mail" />}
-                                placeholder="请输入您的邮箱"
+                                prefix={<Icon type="idcard" />}
+                                placeholder="请输入您的学号"
                                 onPressEnter={this.handleOk}
                             />
                         )
                     }</FormItem>
                     <FormItem hasFeedback>{
-                        getFieldDecorator('password', {
+                        getFieldDecorator('name', {
                             rules: [{
                                 required: true,
-                                message: '密码不能为空',
+                                message: '姓名不能为空',
                             }],
                         })(
                             <Input
-                                type="password"
-                                prefix={<Icon type="lock" />}
+                                prefix={<Icon type="user" />}
+                                placeholder="请输入您的姓名"
                                 onPressEnter={this.handleOk}
-                                placeholder="请输入您的密码"
                             />
                         )
                     }</FormItem>
                     <FormItem className="center">
                         <Button
                             type="primary"
-                            onClick={() => this.handleOk()}
-                            loading={loginLoading}
+                            onClick={this.handleOk}
+                            loading={updateLoading}
                         >
-                            登录
+                            提交
                         </Button>
                     </FormItem>
                     <FormItem className="center">
-                        <Button>
-                            <Link to="/register">去注册</Link>
-                        </Button>
+                        <Button onClick={this.logout}>退出登录</Button>
                     </FormItem>
                     { errHint }
                 </form>
@@ -88,4 +95,6 @@ class Login extends PureComponent {
     }
 };
 
-export default connect(({ auth }) => ({ auth }))(Form.create()(Login));
+export default connect(
+    ({ auth, user }) => ({ auth, user })
+)(Form.create()(Verification));

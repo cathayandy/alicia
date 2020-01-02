@@ -8,31 +8,21 @@ import './Account.less';
 class Account extends PureComponent {
     constructor(props) {
         super(props);
-        this.state = {
-        };
-        this.submit = this.submit.bind(this);
         this.logout = this.logout.bind(this);
-    }
-    submit() {
-        this.props.dispatch({
-            type: 'user/updateInfo',
-            payload: {
-            },
-        });
     }
     logout() {
         this.props.dispatch({
-            type: 'auth/logout',
+            type: 'user/logout',
         });
     }
     renderInfo() {
-        const { id, name, passed, review } = this.props.user.info;
+        const { studentId, name, passed, review } = this.props.user.info;
         return (
             <Fragment>
                 <div className="account-header">
                     <h3>您的信息</h3>
                 </div>
-                <p>学号：{ id }</p>
+                <p>学号：{ studentId }</p>
                 <p>姓名：{ name }</p>
                 <p>是否通过：{ passed ? '是' : '否' }</p>
                 <p>审核意见：{ reviewMap[review] || '暂无' }</p>

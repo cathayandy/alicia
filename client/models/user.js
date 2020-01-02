@@ -25,23 +25,29 @@ async function updateInfo(params) {
     });
 }
 
+const initState = {
+    userLoading: false,
+    updateLoading: false,
+    verificationError: null,
+    info: {
+        studentId: '',
+        name: '',
+        passed: false,
+        review: null,
+    },
+};
+
 export default {
     namespace: 'user',
-    state: {
-        userLoading: false,
-        updateLoading: false,
-        info: {
-            id: '',
-            name: '',
-            passed: false,
-        },
-    },
+    state: { ...initState },
     subscriptions: {
         setupHistory({ dispatch, history }) {
-            history.listen(() => {
-                dispatch({
-                    type: 'getById',
-                });
+            history.listen(({ pathname }) => {
+                if (pathname === '/account') {
+                    dispatch({
+                        type: 'getById',
+                    });
+                }
             });
         },
     },
@@ -65,6 +71,8 @@ export default {
                             },    
                         },
                     });
+                    if (!data.result.studentId)
+                        yield put(routerRedux.push('/verification'));
                 } else if (err) {
                     console.error(err);
                 }
@@ -75,7 +83,13 @@ export default {
         },
         *updateInfo({ payload }, { call, put: _put }) {
             const put = _put.resolve;
-            yield put({ type: 'save', payload: { updateLoading: true } });
+            yield put({
+                type: 'save',
+                payload: {
+                    updateLoading: true,
+                    verificationError: null,
+                },
+            });
             try {
                 const { data, err } = yield call(updateInfo, payload);
                 if (!err && data.success) {
@@ -87,14 +101,29 @@ export default {
                             },    
                         },
                     });
-                } else if (err) {
-                    console.error(err);
+                } else {
+                    let info;
+                    if (err) {
+                        info = err.info || err;
+                    } else if (data && !data.success && data.info) {
+                        info = data.info;
+                    }
+                    yield put({
+                        type: 'save',
+                        payload: { verificationError: info },
+                    });
+                    console.error(info);
                 }
             } catch (err) {
                 console.error(err);
             }
             yield put({ type: 'save', payload: { updateLoading: false } });
             yield put(routerRedux.push({ pathname: '/account' }));
+        },
+        *logout(_, { put: _put }) {
+            const put = _put.resolve;
+            yield put({ type: 'save', payload: initState });
+            yield put({ type: 'auth/logout' });
         },
     },
 };

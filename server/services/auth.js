@@ -1,7 +1,22 @@
 const jsonwebtoken = require('jsonwebtoken');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
+const Sequelize = require('sequelize');
 const config = require('../config.json');
-const { User } = require('../models');
+const smtp = require('../lib/smtp');
+const { User, Captcha } = require('../models');
+
+const emailReg =
+/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+function randomStr(len) {
+    return Math.random().toString(36).slice(2, len + 2);
+}
+
+function isExpired(ts, duration) {
+    const now = new Date();
+    const delta = now - ts;
+    return delta > duration;
+}
 
 async function errWrapper(ctx, next) {
     return next().catch(err => {
@@ -15,9 +30,9 @@ async function errWrapper(ctx, next) {
 }
 
 async function login(ctx) {
-    const { id, name } = ctx.request.body;
+    const { email, password } = ctx.request.body;
     const user = await User.findOne({
-        where: { id },
+        where: { email },
     });
     if (!user) {
         ctx.body = {
@@ -27,16 +42,16 @@ async function login(ctx) {
         ctx.status = 401;
         return;
     }
-    const match = name === user.name; // await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.password);
     if (match) {
-        const role = config.adminList.find(v => v === id) ?
+        const role = config.adminList.find(v => v === email) ?
             'admin' : 'user';
         ctx.body = {
             success: true,
             role,
-            id,
+            id: user.id,
             token: jsonwebtoken.sign({
-                id,
+                id: user.id,
                 exp: Math.floor(Date.now() / 1000) + config.jwt.exp,
             }, config.jwt.secret),
         };
@@ -60,9 +75,7 @@ async function verify(ctx, next) {
     } catch (err) {
         if (401 === err.status) {
             const id = ctx.state.jwtdata.id;
-            const user = await User.findOne({
-                where: { id },
-            });
+            const user = await User.findByPk(id);
             if (!user) {
                 ctx.throw(401);
             }
@@ -76,6 +89,77 @@ async function verify(ctx, next) {
     }
 }
 
+async function sendCaptcha(ctx) {
+    // TODO limited frequency
+    const { email } = ctx.request.body;
+    // check email
+    if (!emailReg.test(email)) {
+        ctx.body = {
+            success: false,
+            info: 'Invalid email address',
+        };
+        return;
+    }
+    // generate & save captcha
+    const captcha = randomStr(6);
+    await Captcha.upsert({ email, captcha });
+    // send captcha to user
+    const mailOptions = {
+        from: config.smtp.from,
+        to: email,
+        subject: '免修申请平台',
+        html: `您的注册码为: <b>${captcha}</b>`,
+    };
+    await smtp.transporter.sendMail(mailOptions);
+    ctx.body = {
+        success: true,
+    };
+}
+
+async function register(ctx) {
+    const { email, password, captcha } = ctx.request.body;
+    // check email
+    if (!emailReg.test(email)) {
+        ctx.body = {
+            success: false,
+            info: 'Invalid Email Address',
+        };
+        return;
+    }
+    // check captcha
+    const target = await Captcha.findOne({
+        where: { email, captcha },
+    });
+    if (!target || isExpired(target.updatedAt, config.captchaExp)) {
+        ctx.body = {
+            success: false,
+            info: 'Captcha Invalid or Expired',
+        };
+        return;
+    }
+    // create user
+    const hash = await bcrypt.hash(password, config.bcrypt.round);
+    try {
+        await User.create({
+            email: email.toLowerCase(),
+            password: hash,
+        });
+    } catch (err) {
+        if (err instanceof Sequelize.UniqueConstraintError) {
+            ctx.body = {
+                success: false,
+                info: 'Email Already Existed',
+            };
+            return;
+        } else {
+            throw(err);
+        }
+    }
+    ctx.body = {
+        success: true,
+    };
+}
+
 async function check(ctx, next) {
     if (ctx.state.id === ctx.state.jwtdata.id) {
         await next();
@@ -85,7 +169,8 @@ async function check(ctx, next) {
 }
 
 async function checkAdmin(ctx, next) {
-    if (config.adminList.find(id => id === ctx.state.jwtdata.id)) {
+    const user = await User.findByPk(ctx.state.jwtdata.id);
+    if (config.adminList.find(email => email === user.email)) {
         await next();
     } else {
         ctx.throw(401);
@@ -93,5 +178,5 @@ async function checkAdmin(ctx, next) {
 }
 
 module.exports = {
-    errWrapper, login, verify, check, checkAdmin,
+    errWrapper, login, verify, check, checkAdmin, sendCaptcha, register,
 };

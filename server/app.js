@@ -53,6 +53,8 @@ app.use(async (ctx, next) => {
 // auth
 app.use(auth.errWrapper);
 app.use(route.post('/api/login', auth.login));
+app.use(route.post('/api/register', auth.register));
+app.use(route.post('/api/captcha', auth.sendCaptcha));
 // private guard
 app.use(jwt({ secret: config.jwt.secret, key: 'jwtdata' }));
 // private routes
@@ -84,5 +86,7 @@ app.use(route.post('/api/users/permission', user.batchPermit));
 app.use(route.post('/api/users/:id/permission', user.permit));
 app.use(route.delete('/api/users/:id/permission', user.reject));
 app.use(route.post('/api/users/:id/review', user.review));
+app.use(route.post('/api/users/notice', user.noticeAll));
+app.use(route.post('/api/users/export', user.exportList));
 // response
 app.listen(config.port);

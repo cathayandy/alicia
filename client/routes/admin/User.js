@@ -8,8 +8,8 @@ import { reviewMap, certTypeMap } from '../../utils';
 const Option = Select.Option;
 
 const columns = [{
-    key: 'id',
-    dataIndex: 'id',
+    key: 'studentId',
+    dataIndex: 'studentId',
     title: '学号',
 }, {
     key: 'name',
@@ -62,6 +62,8 @@ class UserAdmin extends PureComponent {
         this.permit = this.permit.bind(this);
         this.review = this.review.bind(this);
         this.batchPermit = this.batchPermit.bind(this);
+        this.noticeAll = this.noticeAll.bind(this);
+        this.exportList = this.exportList.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onSelectAll = this.onSelectAll.bind(this);
         this.onChange = this.onChange.bind(this);
@@ -74,6 +76,17 @@ class UserAdmin extends PureComponent {
             cancelText: '返回',
             onOk: () => this.permit(record)(true),
             onCancel: () => {},
+            width: 800,
+        });
+    }
+    exportList() {
+        this.props.dispatch({
+            type: 'admin/exportList',
+        });
+    }
+    noticeAll() {
+        this.props.dispatch({
+            type: 'admin/noticeAll',
         });
     }
     batchPermit() {
@@ -207,11 +220,15 @@ class UserAdmin extends PureComponent {
                     <Button
                         icon="download"
                         style={{ marginRight: '5px' }}
+                        onClick={this.exportList}
+                        loading={this.props.admin.exportLoading}
                     >
                         导出所有已申请用户信息
                     </Button>
                     <Button
                         icon="notification"
+                        onClick={this.noticeAll}
+                        loading={this.props.admin.noticeLoading}
                     >
                         邮件通知所有已申请用户
                     </Button>

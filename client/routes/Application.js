@@ -20,6 +20,7 @@ class Application extends PureComponent {
         this.state = {
             fileList: [],
         };
+        this.handleOk = this.handleOk.bind(this);
         this.normFile = this.normFile.bind(this);
         this.onCertChange = this.onCertChange.bind(this);
     }
@@ -80,20 +81,7 @@ class Application extends PureComponent {
                             <Input
                                 prefix={<Icon type="mobile" />}
                                 placeholder="请输入您的手机，选填"
-                                onPressEnter={() => this.handleOk()}
-                            />
-                        )
-                    }</FormItem>
-                    <FormItem hasFeedback>{
-                        getFieldDecorator('email', {
-                            rules: [{
-                                required: true,
-                            }],
-                        })(
-                            <Input
-                                prefix={<Icon type="mail" />}
-                                placeholder="请输入您的邮箱"
-                                onPressEnter={() => this.handleOk()}
+                                onPressEnter={this.handleOk}
                             />
                         )
                     }</FormItem>
@@ -106,7 +94,7 @@ class Application extends PureComponent {
                         })(
                             <Select
                                 placeholder="请选择您的免修类别"
-                                onPressEnter={() => this.handleOk()}
+                                onPressEnter={this.handleOk}
                             >
                                 { options }
                             </Select>
@@ -125,7 +113,7 @@ class Application extends PureComponent {
                                     <InputNumber
                                         style={{ width: '100%' }}
                                         placeholder="请填写您的分数"
-                                        onPressEnter={() => this.handleOk()}
+                                        onPressEnter={this.handleOk}
                                     />
                                 )
                             }</FormItem>
@@ -171,7 +159,7 @@ class Application extends PureComponent {
                     <FormItem className="center">
                         <Button
                             type="primary"
-                            onClick={() => this.handleOk()}
+                            onClick={this.handleOk}
                             loading={updateLoading}
 
                         >
@@ -180,7 +168,7 @@ class Application extends PureComponent {
                     </FormItem>
                     <FormItem className="center">
                         <Button>
-                            <Link to="account">返回</Link>
+                            <Link to="/account">返回</Link>
                         </Button>
                     </FormItem>
                 </form>

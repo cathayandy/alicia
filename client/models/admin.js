@@ -1,4 +1,6 @@
 import request from '../utils/request';
+import { certTypeMap, reviewMap, fileDownload } from '../utils';
+import { message } from 'antd';
 
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -62,6 +64,28 @@ async function batchPermit(idList) {
     });
 }
 
+async function noticeAll() {
+    const adminId = localStorage.getItem('id');
+    if (!adminId) {
+        return Promise.reject('Not login');
+    }
+    return request(`/api/users/notice`, {
+        method: 'POST',
+        headers,
+    });
+}
+
+async function exportList() {
+    const adminId = localStorage.getItem('id');
+    if (!adminId) {
+        return Promise.reject('Not login');
+    }
+    return request(`/api/users/export`, {
+        method: 'POST',
+        headers,
+    });
+}
+
 async function getUserList({ pagination: { pageSize=10, current=0 }}) {
     const adminId = localStorage.getItem('id');
     if (!adminId) {
@@ -75,6 +99,8 @@ export default {
     state: {
         permitLoading: new Set(),
         reviewLoading: new Set(),
+        noticeLoading: false,
+        exportLoading: false,
         listLoading: false,
         users: [],
         pagination: {
@@ -286,6 +312,43 @@ export default {
                     el: payload.id,
                 },
             });
+        },
+        *noticeAll(_, { call, put: _put}) {
+            const put = _put.resolve;
+            yield put({ type: 'save', payload: { noticeLoading: true } });
+            try {
+                const { data, err } = yield call(noticeAll);
+                if (!err && data.success) {
+                    message.success('邮件发送成功！');
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            yield put({ type: 'save', payload: { noticeLoading: false } });
+        },
+        *exportList(_, { call, put: _put}) {
+            const put = _put.resolve;
+            yield put({ type: 'save', payload: { exportLoading: true } });
+            try {
+                const { data, err } = yield call(exportList);
+                if (!err && data.success) {
+                    const users = data.result.list;
+                    const csvStr = users.map(user => {
+                        user[5] = certTypeMap[user[5]] || user[5];
+                        user[8] = reviewMap[user[8]] || user[8];
+                        user[7] = user[7] ? '通过' : user[8];
+                        return user.slice(0, 8).toString();
+                    }).join('\n');
+                    fileDownload('\uFEFF' + csvStr, '学生信息.csv');
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            yield put({ type: 'save', payload: { exportLoading: false } });
         },
     },
 };

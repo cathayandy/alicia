@@ -1,5 +1,6 @@
 import { routerRedux } from 'dva/router';
 import request from '../utils/request';
+import { sleep } from '../utils';
 
 const enterRoutes = [/^\/login/];
 const adminRoutes = [/^\/admin/];
@@ -15,19 +16,39 @@ function testUser(route) {
     return userRoutes.reduce((prev, cur) => prev || cur.test(route), false);
 }
 
-function login({ id, name }) {
+function login({ email, password }) {
     return request('/api/login', {
         method: 'POST',
-        body: `id=${id}&name=${name}`,
+        body: `email=${email}&password=${password}`,
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             Accept: 'application/json',
         },
     });
 }
-function verify() {
+async function verify() {
     return request('/api/verify', {
         method: 'POST',
+    });
+}
+async function register({ email, password, captcha }) {
+    return request('/api/register', {
+        method: 'POST',
+        body: `email=${email}&password=${password}&captcha=${captcha}`,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+        },
+    });
+}
+async function sendCaptcha({ email }) {
+    return request('/api/captcha', {
+        method: 'POST',
+        body: `email=${email}`,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+        },
     });
 }
 
@@ -36,7 +57,11 @@ export default {
     state: {
         loginLoading: false,
         verifyLoading: false,
+        captchaLoading: false,
+        registerLoading: false,
         loginError: null,
+        registerError: null,
+        remaining: 0,
     },
     subscriptions: {
         setupHistory({ dispatch, history }) {
@@ -124,5 +149,80 @@ export default {
             yield put({ type: 'save', payload: { loginLoading: false } });
             yield put(routerRedux.push('/login'));
         },
+        *register({ payload }, { put: _put, call }) {
+            const put = _put.resolve;
+            yield put({
+                type: 'save',
+                payload: {
+                    registerLoading: true,
+                    registerError: null,
+                },
+            });
+            const { data, err } = yield call(register, payload);
+            yield put({ type: 'save', payload: { registerLoading: false } });
+            if (!err && data.success) {
+                yield put({
+                    type: 'save',
+                    payload: {
+                        loginError: null,
+                    },
+                });
+                yield put(routerRedux.push('/login'));
+            } else {
+                let info;
+                if (err) {
+                    info = err.info || err;
+                } else if (data && !data.success && data.info) {
+                    info = data.info;
+                }
+                yield put({
+                    type: 'save',
+                    payload: { registerError: info },
+                });
+                console.error(info);
+            }
+        },
+        *sendCaptcha({ payload }, { put: _put, call }) {
+            const put = _put.resolve;
+            yield put({ type: 'save', payload: { captchaLoading: true } });
+            const { data, err } = yield call(sendCaptcha, payload);
+            yield put({ type: 'save', payload: { captchaLoading: false }});
+            if (!err && data.success) {
+                yield put({
+                    type: 'countdown',
+                    payload: { remaining: 60 },
+                });
+            } else {
+                let info;
+                if (err) {
+                    info = err.info || err;
+                } else if (data && !data.success && data.info) {
+                    info = data.info;
+                }
+                console.error(info);
+            }
+        },
+        *sleep({ payload: { time } }, { call }) {
+            yield call(sleep, time);
+        },
+        *countdown({ payload: { remaining } }, { put: _put }) {
+            const put = _put.resolve;
+            yield put({
+                type: 'save',
+                payload: {
+                    remaining,
+                }
+            });
+            if (remaining > 0) {
+                yield put({
+                    type: 'sleep',
+                    payload: { time: 1000 },
+                });
+                yield put({
+                    type: 'countdown',
+                    payload: { remaining: remaining - 1 },
+                });
+            }
+        }
     },
 };

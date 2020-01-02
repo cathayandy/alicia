@@ -1,24 +1,27 @@
 module.exports = (sequelize, Sequelize) => {
     const User = sequelize.define('User', {
-        id: {
+        email: {
+            type: Sequelize.STRING(100),
+            allowNull: false,
+        },
+        password: {
             type: Sequelize.STRING(50),
             allowNull: false,
-            primaryKey: true,
         },
-        name: {
-            type: Sequelize.STRING(100),
-            allowNull: false,
-        },
-        institute: {
-            type: Sequelize.STRING(100),
-            allowNull: false,
-        },
-        phone: {
+        studentId: {
             type: Sequelize.STRING(50),
             allowNull: true,
         },
-        email: {
+        name: {
             type: Sequelize.STRING(100),
+            allowNull: true,
+        },
+        institute: {
+            type: Sequelize.STRING(100),
+            allowNull: true,
+        },
+        phone: {
+            type: Sequelize.STRING(50),
             allowNull: true,
         },
         reason: {
@@ -42,10 +45,18 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.TEXT,
             allowNull: true,
         },
+        lastUpdated: {
+            type: Sequelize.DATE,
+            allowNull: true,
+        },
+        lastReviewed: {
+            type: Sequelize.DATE,
+            allowNull: true,
+        },
     }, {
         indexes: [{
             unique: true,
-            fields: ['id'],
+            fields: ['email'],
         }],
     });
     return User;

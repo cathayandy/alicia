@@ -33,8 +33,9 @@
         "round": 10
     },
     "adminList": [
-        "admin"
+        "admin@admin.com"
     ],
+    "captchaExp": 300000,
     "staticExp": 315360000000,
     "port": 8101
 }
