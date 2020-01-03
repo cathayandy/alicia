@@ -341,7 +341,8 @@ export default {
                         user[7] = user[7] ? '通过' : user[8];
                         return user.slice(0, 8).toString();
                     }).join('\n');
-                    fileDownload('\uFEFF' + csvStr, '学生信息.csv');
+                    const head = '姓名,学号,院系,手机,邮箱,免修类别,成绩,是否通过,审批意见\n';
+                    fileDownload('\uFEFF' + head + csvStr, '学生信息.csv');
                 } else if (err) {
                     console.error(err);
                 }

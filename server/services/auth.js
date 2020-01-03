@@ -107,8 +107,8 @@ async function sendCaptcha(ctx) {
     const mailOptions = {
         from: config.smtp.from,
         to: email,
-        subject: '免修申请平台',
-        html: `您的注册码为: <b>${captcha}</b>`,
+        subject: '注册验证码',
+        html: `您的验证码为: <b>${captcha}</b>`,
     };
     await smtp.transporter.sendMail(mailOptions);
     ctx.body = {

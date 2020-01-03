@@ -8,7 +8,7 @@ Built using [Dva.js](https://dvajs.com/), [Ant Design](https://ant.design), [Web
 
 *   [Node.js v8+](https://nodejs.org)
     
-    It is recommanded using [Node Version Manager](https://github.com/creationix/nvm) aka nvm to install Node.js on your server.
+    It is recommended using [Node Version Manager](https://github.com/creationix/nvm) aka nvm to install Node.js on your server.
 
     1.  Install nvm
 
@@ -27,6 +27,7 @@ Built using [Dva.js](https://dvajs.com/), [Ant Design](https://ant.design), [Web
 
     git clone git@github.com:cathayandy/alicia.git
     cd alicia
+    mkdir server/uploads
     npm install
 
 *   Run backend services:
@@ -80,8 +81,8 @@ Visit `/admin` to enter the admin dashboard.
 Initial settings:
 
 ```
-id: admin
-name: admin
+id: admin@admin.com
+name: 123456
 ```
 
 You can see `server/students.csv.sample` and `server/config.json.sample` for more details.
