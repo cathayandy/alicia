@@ -373,8 +373,8 @@ export default {
                     const csvStr = users.map(user => {
                         user[5] = certTypeMap[user[5]] || user[5];
                         user[8] = reviewMap[user[8]] || user[8];
-                        user[7] = user[7] ? '通过' : user[8];
-                        return user.slice(0, 8).toString();
+                        user[7] = user[7] ? '通过' : '未通过';
+                        return user.slice(0, 9).toString();
                     }).join('\n');
                     let name = '学生信息';
                     if (payload.passed) {

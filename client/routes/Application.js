@@ -31,7 +31,7 @@ class Application extends PureComponent {
         if (isNaN(value)) {
             callback('分数不合法');
         } else if (reason === 'toefl') {
-            if (value > 120 && value < 0) {
+            if (value > 120 || value < 0) {
                 callback('分数不合法');
             } else if (value < 95) {
                 callback('分数未达标');
@@ -39,7 +39,7 @@ class Application extends PureComponent {
                 callback();
             }
         } else if (reason === 'ielts') {
-            if (value > 9 && value < 0) {
+            if (value > 9 || value < 0) {
                 callback('分数不合法');
             } else if (value < 6.5) {
                 callback('分数未达标');
@@ -47,7 +47,7 @@ class Application extends PureComponent {
                 callback();
             }
         } else if (reason === 'gmat') {
-            if (value > 800 && value < 0) {
+            if (value > 800 || value < 0) {
                 callback('分数不合法');
             } else if (value < 650) {
                 callback('分数未达标');
@@ -55,7 +55,7 @@ class Application extends PureComponent {
                 callback();
             }
         } else if (reason === 'gre') {
-            if (value > 170 && value < 0) {
+            if (value > 170 || value < 0) {
                 callback('分数不合法');
             } else if (value < 145) {
                 callback('分数未达标');
@@ -63,7 +63,7 @@ class Application extends PureComponent {
                 callback();
             }
         } else if (reason === 'cet6') {
-            if (value > 710 && value < 0) {
+            if (value > 710 || value < 0) {
                 callback('分数不合法');
             } else if (value < 600) {
                 callback('分数未达标');
@@ -136,10 +136,10 @@ class Application extends PureComponent {
                     <FormItem hasFeedback>{
                         getFieldDecorator('phone', {
                             rules: [{
-                                pattern: /^1(3|4|5|7|8)\d{9}$/,
+                                pattern: /^1(3|4|5|6|7|8|9)\d{9}$/,
                                 message: '手机号不合法',
                             }],
-                            initialValue: info.phone,
+                            initialValue: info.phone === 'null' ? '' : info.phone,
                         })(
                             <Input
                                 prefix={<Icon type="mobile" />}

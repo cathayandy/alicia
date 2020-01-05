@@ -231,8 +231,7 @@ class UserAdmin extends PureComponent {
             onSelectAll: this.onSelectAll,
             selectedRowKeys: [...this.props.admin.selected.values()],
         };
-        const toggleText = (this.props.admin.appStatus ? '关闭' : '打开') +
-            '申请';
+        const toggleText = (this.props.admin.appStatus ? '申请已打开，点击关闭' : '申请已关闭，点击打开');
         return (
             <Admin>
                 <Table
