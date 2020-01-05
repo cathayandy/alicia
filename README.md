@@ -81,8 +81,8 @@ Visit `/admin` to enter the admin dashboard.
 Initial settings:
 
 ```
-id: admin@admin.com
-name: 123456
+email: admin@admin.com
+password: 123456
 ```
 
 You can see `server/students.csv.sample` and `server/config.json.sample` for more details.
