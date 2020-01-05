@@ -206,8 +206,8 @@ async function exportList(ctx) {
 }
 
 const reviewMap = {
-    'file-broken': '证明文件损坏/无法打开',
-    'file-blur': '证明文件模糊/无法辨认',
+    'file-broken': '证明文件损坏，无法打开',
+    'file-blur': '证明文件模糊，无法辨认',
     'unmatch': '免修类别与证明文件不符',
     // 'disqualified': '未达到要求',
     // 'invalid-phone': '手机无法接通',
@@ -229,7 +229,7 @@ async function noticeAll(ctx) {
             const mailOptions = {
                 from: config.smtp.from,
                 to: email,
-                subject: '免修申请平台',
+                subject: '免修申请结果',
                 html: '恭喜，您的免修申请已通过。',
             };
             await smtp.transporter.sendMail(mailOptions);
@@ -239,7 +239,7 @@ async function noticeAll(ctx) {
             const mailOptions = {
                 from: config.smtp.from,
                 to: email,
-                subject: '免修申请平台',
+                subject: '免修申请结果',
                 html: `抱歉，您的免修申请未通过。${hint}`,
             };
             await smtp.transporter.sendMail(mailOptions);

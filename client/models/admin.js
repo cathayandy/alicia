@@ -384,7 +384,8 @@ export default {
                     } else {
                         name += '.csv'
                     }
-                    fileDownload('\uFEFF' + csvStr, name);
+                    const head = '姓名,学号,院系,手机,邮箱,免修类别,成绩,是否通过,审批意见\n';
+                    fileDownload('\uFEFF' + head + csvStr, name);
                 } else if (err) {
                     console.error(err);
                 }
