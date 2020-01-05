@@ -32,6 +32,7 @@ export const errMap = {
     'Student Not Match': '学号和姓名不匹配',
     'Already Registered': '学号已被其他用户认证',
     'Student Not Found': '学号不存在',
+    'Deadline Passed': '申请已截止',
 };
 
 export const certTypeMap = {

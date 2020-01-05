@@ -1,5 +1,6 @@
 import { routerRedux } from 'dva/router';
 import request from '../utils/request';
+import { sleep } from '../utils';
 
 async function getById() {
     const id = localStorage.getItem('id');
@@ -29,11 +30,9 @@ const initState = {
     userLoading: false,
     updateLoading: false,
     verificationError: null,
+    updateSuccess: false,
     info: {
-        studentId: '',
-        name: '',
         passed: false,
-        review: null,
     },
 };
 
@@ -43,7 +42,7 @@ export default {
     subscriptions: {
         setupHistory({ dispatch, history }) {
             history.listen(({ pathname }) => {
-                if (pathname === '/account') {
+                if (pathname === '/account' || pathname === '/application') {
                     dispatch({
                         type: 'getById',
                     });
@@ -88,37 +87,36 @@ export default {
                 payload: {
                     updateLoading: true,
                     verificationError: null,
+                    updateSuccess: false,
                 },
             });
-            try {
-                const { data, err } = yield call(updateInfo, payload);
-                if (!err && data.success) {
-                    yield put({
-                        type: 'save',
-                        payload: {
-                            info: {
-                                ...data.result
-                            },    
-                        },
-                    });
-                } else {
-                    let info;
-                    if (err) {
-                        info = err.info || err;
-                    } else if (data && !data.success && data.info) {
-                        info = data.info;
-                    }
-                    yield put({
-                        type: 'save',
-                        payload: { verificationError: info },
-                    });
-                    console.error(info);
-                }
-            } catch (err) {
-                console.error(err);
-            }
+            const { data, err } = yield call(updateInfo, payload);
             yield put({ type: 'save', payload: { updateLoading: false } });
-            yield put(routerRedux.push({ pathname: '/account' }));
+            if (!err && data.success) {
+                yield put({
+                    type: 'save',
+                    payload: {
+                        info: {
+                            ...data.result
+                        },
+                        updateSuccess: true,
+                    },
+                });
+                yield call(sleep, 3000);
+                yield put(routerRedux.push({ pathname: '/account' }));
+            } else {
+                let info;
+                if (err) {
+                    info = err.info || err;
+                } else if (data && !data.success && data.info) {
+                    info = data.info;
+                }
+                yield put({
+                    type: 'save',
+                    payload: { verificationError: info },
+                });
+                console.error(info);
+            }
         },
         *logout(_, { put: _put }) {
             const put = _put.resolve;

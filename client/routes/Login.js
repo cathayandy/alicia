@@ -43,6 +43,9 @@ class Login extends PureComponent {
                             rules: [{
                                 required: true,
                                 message: '邮箱不能为空',
+                            }, {
+                                type: 'email',
+                                message: '非法的邮箱格式',
                             }],
                         })(
                             <Input

@@ -53,6 +53,9 @@ class Verification extends PureComponent {
                             rules: [{
                                 required: true,
                                 message: '学号不能为空',
+                            }, {
+                                pattern: /^\d{10}$/,
+                                message: '学号不合法',
                             }],
                         })(
                             <Input

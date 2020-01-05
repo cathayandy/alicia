@@ -11,6 +11,7 @@ require('isomorphic-fetch');
 
 const auth = require('./services/auth');
 const user = require('./services/user');
+const cfg = require('./services/cfg');
 
 // config
 const config = require('./config.json');
@@ -55,6 +56,7 @@ app.use(auth.errWrapper);
 app.use(route.post('/api/login', auth.login));
 app.use(route.post('/api/register', auth.register));
 app.use(route.post('/api/captcha', auth.sendCaptcha));
+app.use(route.get('/api/cfg/application', cfg.getAppStatus));
 // private guard
 app.use(jwt({ secret: config.jwt.secret, key: 'jwtdata' }));
 // private routes
@@ -88,5 +90,7 @@ app.use(route.delete('/api/users/:id/permission', user.reject));
 app.use(route.post('/api/users/:id/review', user.review));
 app.use(route.post('/api/users/notice', user.noticeAll));
 app.use(route.post('/api/users/export', user.exportList));
+app.use(route.put('/api/cfg/application', cfg.openApplication));
+app.use(route.delete('/api/cfg/application', cfg.closeApplication));
 // response
 app.listen(config.port);

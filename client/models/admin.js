@@ -75,13 +75,44 @@ async function noticeAll() {
     });
 }
 
-async function exportList() {
+async function exportList(params) {
     const adminId = localStorage.getItem('id');
     if (!adminId) {
         return Promise.reject('Not login');
     }
+    const body = Object.keys(params).map(k => `${k}=${params[k]}`).join('&');
     return request(`/api/users/export`, {
         method: 'POST',
+        headers,
+        body,
+    });
+}
+
+async function getAppStatus() {
+    return request(`/api/cfg/application`, {
+        method: 'GET',
+        headers,
+    });
+}
+
+async function openApplication() {
+    const adminId = localStorage.getItem('id');
+    if (!adminId) {
+        return Promise.reject('Not login');
+    }
+    return request(`/api/cfg/application`, {
+        method: 'PUT',
+        headers,
+    });
+}
+
+async function closeApplication() {
+    const adminId = localStorage.getItem('id');
+    if (!adminId) {
+        return Promise.reject('Not login');
+    }
+    return request(`/api/cfg/application`, {
+        method: 'DELETE',
         headers,
     });
 }
@@ -102,6 +133,7 @@ export default {
         noticeLoading: false,
         exportLoading: false,
         listLoading: false,
+        appStatus: true,
         users: [],
         pagination: {
             pageSize: 10,
@@ -129,6 +161,9 @@ export default {
                             current,
                         },
                     },
+                });
+                dispatch({
+                    type: 'getAppStatus',
                 });
             });
         },
@@ -313,7 +348,7 @@ export default {
                 },
             });
         },
-        *noticeAll(_, { call, put: _put}) {
+        *noticeAll(_, { call, put: _put }) {
             const put = _put.resolve;
             yield put({ type: 'save', payload: { noticeLoading: true } });
             try {
@@ -328,11 +363,11 @@ export default {
             }
             yield put({ type: 'save', payload: { noticeLoading: false } });
         },
-        *exportList(_, { call, put: _put}) {
+        *exportList({ payload }, { call, put: _put }) {
             const put = _put.resolve;
             yield put({ type: 'save', payload: { exportLoading: true } });
             try {
-                const { data, err } = yield call(exportList);
+                const { data, err } = yield call(exportList, payload);
                 if (!err && data.success) {
                     const users = data.result.list;
                     const csvStr = users.map(user => {
@@ -341,7 +376,15 @@ export default {
                         user[7] = user[7] ? '通过' : user[8];
                         return user.slice(0, 8).toString();
                     }).join('\n');
-                    fileDownload('\uFEFF' + csvStr, '学生信息.csv');
+                    let name = '学生信息';
+                    if (payload.passed) {
+                        name += '-已通过.csv';
+                    } else if (payload.passed === false) {
+                        name += '-未通过.csv';
+                    } else {
+                        name += '.csv'
+                    }
+                    fileDownload('\uFEFF' + csvStr, name);
                 } else if (err) {
                     console.error(err);
                 }
@@ -349,6 +392,64 @@ export default {
                 console.error(err);
             }
             yield put({ type: 'save', payload: { exportLoading: false } });
+        },
+        *openApplication(_, { call, put: _put }) {
+            const put = _put.resolve;
+            yield put({
+                type: 'save', payload: { toggleAppStatusLoading: true },
+            });
+            try {
+                const { data, err } = yield call(openApplication);
+                if (!err && data.success) {
+                    message.success('设置成功！');
+                    yield put({ type: 'getAppStatus' });
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            yield put({
+                type: 'save', payload: { toggleAppStatusLoading: false },
+            });
+        },
+        *closeApplication(_, { call, put: _put }) {
+            const put = _put.resolve;
+            yield put({
+                type: 'save', payload: { toggleAppStatusLoading: true },
+            });
+            try {
+                const { data, err } = yield call(closeApplication);
+                if (!err && data.success) {
+                    message.success('设置成功！');
+                    yield put({ type: 'getAppStatus' });
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            yield put({
+                type: 'save', payload: { toggleAppStatusLoading: false },
+            });
+        },
+        *getAppStatus(_, { call, put: _put }) {
+            const put = _put.resolve;
+            try {
+                const { data, err } = yield call(getAppStatus);
+                if (!err && data.success) {
+                    yield put({
+                        type: 'save',
+                        payload: {
+                            appStatus: data.result,
+                        },
+                    });
+                } else if (err) {
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(err);
+            }
         },
     },
 };

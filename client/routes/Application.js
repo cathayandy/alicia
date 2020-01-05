@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
 import {
-    Button, Form, Input, InputNumber,
+    Button, Form, Input, InputNumber, Alert,
     Select, Upload, Icon, Tooltip, Row, Col
 } from 'antd';
-import { certTypeMap } from '../utils';
+import { certTypeMap, errMap } from '../utils';
 import './Application.less';
 
 const FormItem = Form.Item;
@@ -23,6 +23,56 @@ class Application extends PureComponent {
         this.handleOk = this.handleOk.bind(this);
         this.normFile = this.normFile.bind(this);
         this.onCertChange = this.onCertChange.bind(this);
+        this.validateScore = this.validateScore.bind(this);
+    }
+    validateScore(_rule, value, callback) {
+        const { form } = this.props;
+        const reason = form.getFieldValue('reason');
+        if (isNaN(value)) {
+            callback('分数不合法');
+        } else if (reason === 'toefl') {
+            if (value > 120 && value < 0) {
+                callback('分数不合法');
+            } else if (value < 95) {
+                callback('分数未达标');
+            } else {
+                callback();
+            }
+        } else if (reason === 'ielts') {
+            if (value > 9 && value < 0) {
+                callback('分数不合法');
+            } else if (value < 6.5) {
+                callback('分数未达标');
+            } else {
+                callback();
+            }
+        } else if (reason === 'gmat') {
+            if (value > 800 && value < 0) {
+                callback('分数不合法');
+            } else if (value < 650) {
+                callback('分数未达标');
+            } else {
+                callback();
+            }
+        } else if (reason === 'gre') {
+            if (value > 170 && value < 0) {
+                callback('分数不合法');
+            } else if (value < 145) {
+                callback('分数未达标');
+            } else {
+                callback();
+            }
+        } else if (reason === 'cet6') {
+            if (value > 710 && value < 0) {
+                callback('分数不合法');
+            } else if (value < 600) {
+                callback('分数未达标');
+            } else {
+                callback();
+            }
+        } else {
+            callback('免修类型不合法');
+        }
     }
     handleOk() {
         const { form: { validateFieldsAndScroll }, dispatch } = this.props;
@@ -50,7 +100,7 @@ class Application extends PureComponent {
     }
     render() {
         const {
-            user: { updateLoading },
+            user: { updateLoading, updateSuccess, verificationError, info },
             form: { getFieldDecorator },
         } = this.props;
         const id = localStorage.getItem('id');
@@ -65,6 +115,18 @@ class Application extends PureComponent {
                 <Icon type="question-circle-o" />
             </Tooltip>
         );
+        const successHint = updateSuccess ?
+            <Alert
+                message="上传成功，稍后返回上级页面"
+                type="success"
+                banner
+            /> : undefined;
+        const errHint = verificationError ?
+            <Alert
+                message={errMap[verificationError] || '上传失败'}
+                type="error"
+                banner
+            /> : undefined;
         return (
             <div className="app-form">
                 <div className="app-header">
@@ -74,9 +136,10 @@ class Application extends PureComponent {
                     <FormItem hasFeedback>{
                         getFieldDecorator('phone', {
                             rules: [{
-                                pattern: /^1((3|4|5|7|8)\d{0,9})?$/,
+                                pattern: /^1(3|4|5|7|8)\d{9}$/,
                                 message: '手机号不合法',
                             }],
+                            initialValue: info.phone,
                         })(
                             <Input
                                 prefix={<Icon type="mobile" />}
@@ -91,6 +154,7 @@ class Application extends PureComponent {
                                 required: true,
                                 message: '免修类别不能为空',
                             }],
+                            initialValue: info.reason,
                         })(
                             <Select
                                 placeholder="请选择您的免修类别"
@@ -107,7 +171,10 @@ class Application extends PureComponent {
                                     rules: [{
                                         required: true,
                                         message: '分数不能为空',
+                                    }, {
+                                        validator: this.validateScore,
                                     }],
+                                    initialValue: info.score,
                                 })(
                                 
                                     <InputNumber
@@ -126,7 +193,7 @@ class Application extends PureComponent {
                             </FormItem>
                         </Col>
                     </Row>
-                    <FormItem>{
+                    <FormItem className="dragger">{
                         getFieldDecorator('cert', {
                             rules: [{
                                 required: true,
@@ -171,6 +238,8 @@ class Application extends PureComponent {
                             <Link to="/account">返回</Link>
                         </Button>
                     </FormItem>
+                    { successHint }
+                    { errHint }
                 </form>
             </div>
         );

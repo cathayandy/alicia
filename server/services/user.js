@@ -29,15 +29,16 @@ async function getById(ctx, _id) {
         !config.adminList.find(email => email === currentUser.email)) {
         ctx.throw(401);
     }
-    const result = await User.findByPk(id);
+    const result = await User.findByPk(id, {
+        attributes: [
+            'studentId', 'name', 'institute', 'phone',
+            'email', 'reason', 'score', 'cert', 'passed',
+            'review', 'lastUpdated', 'lastReviewed',
+        ],
+    });
     ctx.body = {
         success: true,
-        result: {
-            studentId: result.studentId,
-            name: result.name,
-            passed: result.passed,
-            review: result.review,
-        },
+        result,
     };
 }
 
@@ -78,6 +79,13 @@ async function updateInfo(ctx, _id) {
         user.name = name;
         user.institute = student.institute;
     } else {
+        if (!config.appStatus) {
+            ctx.body = {
+                success: false,
+                info: 'Deadline Passed',
+            };
+            return;
+        }
         const { phone, reason, score, cert } = ctx.request.body;
         let flag = false;
         if (phone !== undefined) {
@@ -166,12 +174,18 @@ async function review(ctx, _id) {
 }
 
 async function exportList(ctx) {
-    const users = await User.findAll({
-        where: {
-            lastUpdated: {
-                [Sequelize.Op.ne]: null,
-            },
+    const where = {
+        lastUpdated: {
+            [Sequelize.Op.ne]: null,
         },
+    };
+    if (ctx.request.body.passed === 'true') {
+        where.passed = true;
+    } else if (ctx.request.body.passed === 'false') {
+        where.passed = false;
+    }
+    const users = await User.findAll({
+        where,
         attributes: [
             'name', 'studentId', 'institute', 'phone',
             'email', 'reason', 'score', 'passed', 'review',

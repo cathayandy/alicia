@@ -37,5 +37,6 @@
     ],
     "captchaExp": 300000,
     "staticExp": 315360000000,
+    "appStatus": true,
     "port": 8101
 }

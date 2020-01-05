@@ -6,6 +6,7 @@ import Admin from './Wrapper';
 import { reviewMap, certTypeMap } from '../../utils';
 
 const Option = Select.Option;
+const ButtonGroup = Button.Group;
 
 const columns = [{
     key: 'studentId',
@@ -63,7 +64,10 @@ class UserAdmin extends PureComponent {
         this.review = this.review.bind(this);
         this.batchPermit = this.batchPermit.bind(this);
         this.noticeAll = this.noticeAll.bind(this);
-        this.exportList = this.exportList.bind(this);
+        this.toggleAppStatus = this.toggleAppStatus.bind(this);
+        this.exportAll = this.exportAll.bind(this);
+        this.exportPassed = this.exportPassed.bind(this);
+        this.exportRejected = this.exportRejected.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onSelectAll = this.onSelectAll.bind(this);
         this.onChange = this.onChange.bind(this);
@@ -79,10 +83,38 @@ class UserAdmin extends PureComponent {
             width: 800,
         });
     }
-    exportList() {
+    exportAll() {
         this.props.dispatch({
             type: 'admin/exportList',
+            payload: {},
         });
+    }
+    exportPassed() {
+        this.props.dispatch({
+            type: 'admin/exportList',
+            payload: {
+                passed: true,
+            },
+        });
+    }
+    exportRejected() {
+        this.props.dispatch({
+            type: 'admin/exportList',
+            payload: {
+                passed: false,
+            },
+        });
+    }
+    toggleAppStatus() {
+        if (this.props.admin.appStatus) {
+            this.props.dispatch({
+                type: 'admin/closeApplication',
+            });
+        } else {
+            this.props.dispatch({
+                type: 'admin/openApplication',
+            });
+        }
     }
     noticeAll() {
         this.props.dispatch({
@@ -199,6 +231,8 @@ class UserAdmin extends PureComponent {
             onSelectAll: this.onSelectAll,
             selectedRowKeys: [...this.props.admin.selected.values()],
         };
+        const toggleText = (this.props.admin.appStatus ? '关闭' : '打开') +
+            '申请';
         return (
             <Admin>
                 <Table
@@ -217,20 +251,41 @@ class UserAdmin extends PureComponent {
                     >
                         通过所有选中用户
                     </Button>
-                    <Button
-                        icon="download"
-                        style={{ marginRight: '5px' }}
-                        onClick={this.exportList}
-                        loading={this.props.admin.exportLoading}
-                    >
-                        导出所有已申请用户信息
-                    </Button>
+                    <ButtonGroup>
+                        <Button
+                            icon="download"
+                            onClick={this.exportAll}
+                            loading={this.props.admin.exportLoading}
+                        >
+                            导出所有
+                        </Button>
+                        <Button
+                            onClick={this.exportPassed}
+                            loading={this.props.admin.exportLoading}
+                        >
+                            已通过
+                        </Button>
+                        <Button
+                            style={{ marginRight: '5px' }}
+                            onClick={this.exportRejected}
+                            loading={this.props.admin.exportLoading}
+                        >
+                            未通过
+                        </Button>
+                    </ButtonGroup>
                     <Button
                         icon="notification"
+                        style={{ marginRight: '5px' }}
                         onClick={this.noticeAll}
                         loading={this.props.admin.noticeLoading}
                     >
                         邮件通知所有已申请用户
+                    </Button>
+                    <Button
+                        onClick={this.toggleAppStatus}
+                        loading={this.props.admin.toggleAppStatusLoading}
+                    >
+                        { toggleText }
                     </Button>
                 </div>
             </Admin>
