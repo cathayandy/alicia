@@ -139,7 +139,7 @@ class Application extends PureComponent {
                                 pattern: /^1(3|4|5|6|7|8|9)\d{9}$/,
                                 message: '手机号不合法',
                             }],
-                            initialValue: info.phone === 'null' ? '' : info.phone,
+                            initialValue: info.phone,
                         })(
                             <Input
                                 prefix={<Icon type="mobile" />}
