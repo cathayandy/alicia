@@ -159,12 +159,20 @@ export default {
                 },
             });
             const { data, err } = yield call(register, payload);
-            yield put({ type: 'save', payload: { registerLoading: false } });
             if (!err && data.success) {
                 yield put({
                     type: 'save',
                     payload: {
                         loginError: null,
+                        registerSuccess: true,
+                    },
+                });
+                yield call(sleep, 2000);
+                yield put({
+                    type: 'save',
+                    payload: {
+                        registerLoading: false,
+                        registerSuccess: false,
                     },
                 });
                 yield put(routerRedux.push('/login'));
@@ -177,7 +185,10 @@ export default {
                 }
                 yield put({
                     type: 'save',
-                    payload: { registerError: info },
+                    payload: {
+                        registerError: info,
+                        registerLoading: false,
+                    },
                 });
                 console.error(info);
             }

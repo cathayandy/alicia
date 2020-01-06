@@ -30,9 +30,15 @@ class Verification extends PureComponent {
     }
     render() {
         const {
-            user: { updateLoading, verificationError },
+            user: { updateLoading, verificationError, updateSuccess },
             form: { getFieldDecorator },
         } = this.props;
+        const successHint = updateSuccess ?
+            <Alert
+                message="认证成功，稍后返回上级页面"
+                type="success"
+                banner
+            /> : undefined;
         const errHint = verificationError ?
             <Alert
                 message={errMap[verificationError] || '认证失败'}
@@ -91,6 +97,7 @@ class Verification extends PureComponent {
                     <FormItem className="center">
                         <Button onClick={this.logout}>退出登录</Button>
                     </FormItem>
+                    { successHint }
                     { errHint }
                 </form>
             </div>

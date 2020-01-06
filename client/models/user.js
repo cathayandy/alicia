@@ -15,7 +15,9 @@ async function updateInfo(params) {
     if (!id) {
         return Promise.reject('Not login');
     }
-    const body = Object.keys(params).map(k => `${k}=${params[k]}`).join('&');
+    const body = Object.keys(params)
+        .filter(k => params[k] !== null && params[k] !== undefined)
+        .map(k => `${k}=${params[k]}`).join('&');
     return request(`/api/users/${encodeURIComponent(id)}`, {
         method: 'PATCH',
         body,
@@ -91,7 +93,6 @@ export default {
                 },
             });
             const { data, err } = yield call(updateInfo, payload);
-            yield put({ type: 'save', payload: { updateLoading: false } });
             if (!err && data.success) {
                 yield put({
                     type: 'save',
@@ -102,7 +103,8 @@ export default {
                         updateSuccess: true,
                     },
                 });
-                yield call(sleep, 3000);
+                yield call(sleep, 2000);
+                yield put({ type: 'save', payload: initState });
                 yield put(routerRedux.push({ pathname: '/account' }));
             } else {
                 let info;
@@ -113,7 +115,10 @@ export default {
                 }
                 yield put({
                     type: 'save',
-                    payload: { verificationError: info },
+                    payload: {
+                        verificationError: info,
+                        updateLoading: false,
+                    },
                 });
                 console.error(info);
             }

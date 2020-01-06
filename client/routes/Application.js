@@ -154,7 +154,7 @@ class Application extends PureComponent {
                                 required: true,
                                 message: '免修类别不能为空',
                             }],
-                            initialValue: info.reason,
+                            initialValue: info.reason || undefined,
                         })(
                             <Select
                                 placeholder="请选择您的免修类别"

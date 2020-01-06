@@ -52,11 +52,17 @@ class Register extends PureComponent {
     render() {
         const {
             auth: {
-                registerLoading, registerError,
+                registerLoading, registerError, registerSuccess,
                 captchaLoading, remaining,
             },
             form: { getFieldDecorator },
         } = this.props;
+        const successHint = registerSuccess ?
+            <Alert
+                message="注册成功，稍后返回上级页面"
+                type="success"
+                banner
+            /> : undefined;
         const errHint = registerError ?
             <Alert
                 message={errMap[registerError] || '注册失败'}
@@ -155,6 +161,7 @@ class Register extends PureComponent {
                             <Link to="/login">去登录</Link>
                         </Button>
                     </FormItem>
+                    { successHint }
                     { errHint }
                 </form>
             </div>
