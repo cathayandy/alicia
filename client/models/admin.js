@@ -374,7 +374,7 @@ export default {
                         user[5] = certTypeMap[user[5]] || user[5];
                         user[8] = reviewMap[user[8]] || user[8];
                         user[7] = user[7] ? '通过' : '未通过';
-                        return user.slice(0, 9).toString();
+                        return user.toString();
                     }).join('\n');
                     let name = '学生信息';
                     if (payload.passed) {
