@@ -89,6 +89,25 @@ async function verify(ctx, next) {
     }
 }
 
+function sleep(ms) {
+    return new Promise((resolve, _reject) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+async function sendMail(mailOptions, retries=5) {
+    try {
+        await smtp.transporter.sendMail(mailOptions);
+        return true;
+    } catch (_err) {
+        if (retries <= 0) {
+            return false;
+        }
+        await sleep(1000);
+        return await sendMail(mailOptions, retries - 1);
+    }
+}
+
 async function sendCaptcha(ctx) {
     // TODO limited frequency
     const { email } = ctx.request.body;
@@ -110,10 +129,17 @@ async function sendCaptcha(ctx) {
         subject: '注册验证码',
         html: `您的验证码为: <b>${captcha}</b>`,
     };
-    await smtp.transporter.sendMail(mailOptions);
-    ctx.body = {
-        success: true,
-    };
+    const res = await sendMail(mailOptions);
+    if (res) {
+        ctx.body = {
+            success: true,
+        };
+    } else {
+        ctx.body = {
+            success: false,
+            info: 'Email Sent Failed',
+        };
+    }
 }
 
 async function register(ctx) {

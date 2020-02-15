@@ -1,6 +1,7 @@
 import { routerRedux } from 'dva/router';
+import { message } from 'antd';
 import request from '../utils/request';
-import { sleep } from '../utils';
+import { sleep, errMap } from '../utils';
 
 const enterRoutes = [/^\/login/];
 const adminRoutes = [/^\/admin/];
@@ -210,6 +211,7 @@ export default {
                 } else if (data && !data.success && data.info) {
                     info = data.info;
                 }
+                message.error(errMap[info] || info);
                 console.error(info);
             }
         },
