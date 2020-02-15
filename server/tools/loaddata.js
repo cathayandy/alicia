@@ -32,9 +32,9 @@ function loadData(file, handler) {
 function setupData(title, handler) {
     const file = path.resolve(__dirname, '..', `${title}.csv`);
     loadData(file, handler);
-    config.adminList.forEach(async admin => {
-        const hash = await bcrypt.hash('123456', config.bcrypt.round);
-        await User.create({ email: admin.toLowerCase(), password: hash });
+    config.adminList.forEach(async ([email, pass]) => {
+        const hash = await bcrypt.hash(pass, config.bcrypt.round);
+        await User.upsert({ email: email.toLowerCase(), password: hash });
     });
 }
 setupData('students', handleData);

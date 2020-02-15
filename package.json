@@ -10,7 +10,8 @@
     "build": "rm -rf dist && webpack --config client/configs/webpack.prod.js",
     "dump": "rm -rf dist && webpack --config client/configs/webpack.prod.js --json > stats.json",
     "load": "node server/tools/loaddata.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "mail": "node server/tools/testsmtp.js",
+    "resetadmin": "node server/tools/resetadmin.js"
   },
   "repository": {
     "type": "git",

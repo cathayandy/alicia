@@ -25,6 +25,11 @@
         },
         "from": "\"教学办公室\" <admin@yourserver.com>"
     },
+    "mailFreq": {
+        "interval": 5000,
+        "amount": 10,
+        "retries": 5
+    },
     "jwt": {
         "secret": "f9a7w3mv1u7",
         "exp": 3600
@@ -33,7 +38,7 @@
         "round": 10
     },
     "adminList": [
-        "admin@admin.com"
+        ["admin@admin.com", "123456"],
     ],
     "captchaExp": 300000,
     "staticExp": 315360000000,

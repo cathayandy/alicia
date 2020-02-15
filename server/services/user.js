@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const config = require('../config.json');
-const smtp = require('../lib/smtp');
+const { sendMail } = require('../lib/smtp');
 const { User, Student } = require('../models');
 
 async function getList(ctx) {
@@ -26,7 +26,7 @@ async function getById(ctx, _id) {
     const id = +_id;
     const currentUser = await User.findByPk(ctx.state.jwtdata.id);
     if (ctx.state.jwtdata.id !== id &&
-        !config.adminList.find(email => email === currentUser.email)) {
+        !config.adminList.find(([e, _p]) => e === currentUser.email)) {
         ctx.throw(401);
     }
     const result = await User.findByPk(id, {
@@ -232,7 +232,7 @@ async function noticeAll(ctx) {
                 subject: '免修申请结果',
                 html: '恭喜，您的免修申请已通过。',
             };
-            await smtp.transporter.sendMail(mailOptions);
+            sendMail(mailOptions, 'notice');
         } else {
             const hint = review ?
                 `原因为：${reviewMap[review] || review}` : '';
@@ -242,7 +242,7 @@ async function noticeAll(ctx) {
                 subject: '免修申请结果',
                 html: `抱歉，您的免修申请未通过。${hint}`,
             };
-            await smtp.transporter.sendMail(mailOptions);
+            sendMail(mailOptions, 'notice');
         }
     }
     ctx.body = {

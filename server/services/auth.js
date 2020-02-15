@@ -2,7 +2,7 @@ const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const config = require('../config.json');
-const smtp = require('../lib/smtp');
+const { sendMail } = require('../lib/smtp');
 const { User, Captcha } = require('../models');
 
 const emailReg =
@@ -44,7 +44,7 @@ async function login(ctx) {
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
-        const role = config.adminList.find(v => v === email) ?
+        const role = config.adminList.find(([e, _p]) => e === email) ?
             'admin' : 'user';
         ctx.body = {
             success: true,
@@ -89,33 +89,24 @@ async function verify(ctx, next) {
     }
 }
 
-function sleep(ms) {
-    return new Promise((resolve, _reject) => {
-        setTimeout(resolve, ms);
-    });
-}
-
-async function sendMail(mailOptions, retries=5) {
-    try {
-        await smtp.transporter.sendMail(mailOptions);
-        return true;
-    } catch (_err) {
-        if (retries <= 0) {
-            return false;
-        }
-        await sleep(1000);
-        return await sendMail(mailOptions, retries - 1);
-    }
-}
-
 async function sendCaptcha(ctx) {
-    // TODO limited frequency
     const { email } = ctx.request.body;
     // check email
     if (!emailReg.test(email)) {
         ctx.body = {
             success: false,
             info: 'Invalid email address',
+        };
+        return;
+    }
+    // check existence
+    const user = await User.findOne({
+        where: { email },
+    });
+    if (user) {
+        ctx.body = {
+            success: false,
+            info: 'Email Already Existed',
         };
         return;
     }
@@ -129,7 +120,7 @@ async function sendCaptcha(ctx) {
         subject: '注册验证码',
         html: `您的验证码为: <b>${captcha}</b>`,
     };
-    const res = await sendMail(mailOptions);
+    const res = await sendMail(mailOptions, 'captcha');
     if (res) {
         ctx.body = {
             success: true,
@@ -196,7 +187,7 @@ async function check(ctx, next) {
 
 async function checkAdmin(ctx, next) {
     const user = await User.findByPk(ctx.state.jwtdata.id);
-    if (config.adminList.find(email => email === user.email)) {
+    if (config.adminList.find(([e, _p]) => e === user.email)) {
         await next();
     } else {
         ctx.throw(401);
