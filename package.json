@@ -56,6 +56,7 @@
     "babel-plugin-dva-hmr": "^0.4.2",
     "babel-plugin-import": "^1.12.2",
     "compression-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.2.0",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",

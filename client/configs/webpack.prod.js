@@ -6,6 +6,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const common = require('./webpack.common.js');
 
 module.exports = merge.smart(common, {
@@ -19,6 +20,25 @@ module.exports = merge.smart(common, {
         'react-dom': 'ReactDOM',
     },
     plugins: [
+        new CopyPlugin([{
+            from: path.resolve(process.cwd(), 'node_modules', 'react', 'umd', 'react.production.min.js'),
+            to: path.resolve(process.cwd(), 'dist'),
+        }, {
+            from: path.resolve(process.cwd(), 'node_modules', 'react-dom', 'umd', 'react-dom.production.min.js'),
+            to: path.resolve(process.cwd(), 'dist'),
+        }, {
+            from: path.resolve(process.cwd(), 'node_modules', 'moment', 'min', 'moment.min.js'),
+            to: path.resolve(process.cwd(), 'dist'),
+        }, {
+            from: path.resolve(process.cwd(), 'node_modules', 'dva', 'dist', 'dva.min.js'),
+            to: path.resolve(process.cwd(), 'dist'),
+        }, {
+            from: path.resolve(process.cwd(), 'node_modules', 'dva', 'dist', 'dva.router.min.js'),
+            to: path.resolve(process.cwd(), 'dist'),
+        }, {
+            from: path.resolve(process.cwd(), 'node_modules', 'dva', 'dist', 'dva.dynamic.min.js'),
+            to: path.resolve(process.cwd(), 'dist'),
+        }]),
         new CompressionPlugin({
             threshold: 10000,
         }),
