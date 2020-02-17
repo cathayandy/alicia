@@ -171,7 +171,12 @@ async function register(ctx) {
             };
             return;
         } else {
-            throw(err);
+            console.error(err);
+            ctx.body = {
+                success: false,
+                info: 'Unknown',
+            };
+            return;
         }
     }
     ctx.body = {
