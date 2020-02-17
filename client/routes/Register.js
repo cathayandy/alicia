@@ -125,6 +125,7 @@ class Register extends PureComponent {
                             />
                         )
                     }</FormItem>
+                    {/*
                     <FormItem>{
                         getFieldDecorator('captcha', {
                             rules: [{
@@ -146,6 +147,7 @@ class Register extends PureComponent {
                             />
                         )
                     }</FormItem>
+                    */}
                     <FormItem className="center">
                         <Button
                             type="primary"

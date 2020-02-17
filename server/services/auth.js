@@ -144,6 +144,7 @@ async function register(ctx) {
         return;
     }
     // check captcha
+    /*
     const target = await Captcha.findOne({
         where: { email, captcha },
     });
@@ -154,6 +155,7 @@ async function register(ctx) {
         };
         return;
     }
+    */
     // create user
     const hash = await bcrypt.hash(password, config.bcrypt.round);
     try {
