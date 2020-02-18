@@ -13,6 +13,9 @@ async function getList(ctx) {
             'email', 'reason', 'score', 'cert', 'passed', 'review',
             'lastUpdated', 'lastReviewed',
         ],
+        where: {
+            cert: { [Sequelize.Op.ne]: null },
+        },
     });
     ctx.body = {
         success: true,

@@ -10,7 +10,8 @@
     "build": "rm -rf dist && webpack --config client/configs/webpack.prod.js",
     "dump": "rm -rf dist && webpack --config client/configs/webpack.prod.js --json > stats.json",
     "load": "node server/tools/loaddata.js",
-    "mail": "node server/tools/testsmtp.js",
+    "testmail": "node server/tools/testsmtp.js",
+    "testreg": "node server/tools/testreg.js",
     "resetadmin": "node server/tools/resetadmin.js"
   },
   "repository": {

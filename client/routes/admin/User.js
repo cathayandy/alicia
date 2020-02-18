@@ -235,7 +235,7 @@ class UserAdmin extends PureComponent {
         return (
             <Admin>
                 <Table
-                    size="middle" rowKey="id" columns={columns}
+                    size="small" rowKey="id" columns={columns}
                     rowSelection={rowSelection}
                     pagination={this.props.admin.pagination}
                     dataSource={this.props.admin.users}
