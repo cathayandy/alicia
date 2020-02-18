@@ -6,7 +6,7 @@ import './Verification.less';
 
 const FormItem = Form.Item;
 
-const hint = '请填写您的清华学号和姓名，作为身份认证。一旦认证通过，您的身份信息将不可修改，请如实填写，谢谢！（限学号2016、2017、2018开头的同学认证，如有问题，请联系老师）';
+const hint = '请填写您的清华学号和姓名，作为身份认证。一旦认证通过，您的身份信息将不可修改，请如实填写，谢谢！（限学号2014、2015、2016、2017、2018开头的同学认证，如有问题，请联系老师）';
 
 class Verification extends PureComponent {
     constructor(props) {
