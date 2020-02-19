@@ -23,7 +23,7 @@ export default class Admin extends PureComponent {
     renderSider() {
         const { onMenuClick, current } = this.props;
         return (
-            <Sider>
+            <Sider width={140}>
                 <Menu
                     onClick={onMenuClick}
                     selectedKeys={[current]}
