@@ -20,10 +20,31 @@ class Application extends PureComponent {
         this.state = {
             fileList: [],
         };
+        if (props.user.info.cert) {
+            this.state.fileList.push({
+                uid: '-1',
+                name: '证明文件',
+                status: 'done',
+                type: 'image/*',
+                url: `/${props.user.info.cert}`,
+            });
+        }
         this.handleOk = this.handleOk.bind(this);
         this.normFile = this.normFile.bind(this);
         this.onCertChange = this.onCertChange.bind(this);
         this.validateScore = this.validateScore.bind(this);
+    }
+    componentWillReceiveProps(props) {
+        if (props.user.info.cert &&
+            props.user.info.cert !== this.props.user.info.cert) {
+            this.setState({ fileList: [{
+                uid: '-1',
+                name: '证明文件',
+                status: 'done',
+                type: 'image/*',
+                url: `/${props.user.info.cert}`,
+            }]});
+        }
     }
     validateScore(_rule, value, callback) {
         const { form } = this.props;
@@ -200,6 +221,7 @@ class Application extends PureComponent {
                                 message: '免修凭证不能为空',
                             }],
                             getValueFromEvent: this.normFile,
+                            initialValue: info.cert,
                         })(
                             <Dragger
                                 name={`cert.${id}`}
