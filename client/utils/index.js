@@ -24,7 +24,8 @@ export const reviewMap = {
 };
 
 export const errMap = {
-    'Not Found': '没有此用户',
+    'Not Found': '404 网络错误，请联系管理员',
+    'User Not Found': '没有此用户',
     'Not Match': '您的用户名和密码不匹配',
     'Captcha Invalid or Expired': '验证码无效或已过期',
     'Invalid Email Address': '邮箱格式错误',

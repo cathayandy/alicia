@@ -37,7 +37,7 @@ async function login(ctx) {
     if (!user) {
         ctx.body = {
             success: false,
-            info: 'Not Found',
+            info: 'User Not Found',
         };
         ctx.status = 401;
         return;
