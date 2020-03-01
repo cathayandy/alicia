@@ -245,9 +245,12 @@ class Application extends PureComponent {
                                     <Icon type="inbox" />
                                 </p>
                                 <p className="ant-upload-text">
-                                    请上传您的免修凭证（仅支持图片及PDF格式）
+                                    请上传您的免修凭证
                                 </p>
                                 <p className="ant-upload-hint">
+                                    仅支持图片及PDF格式
+                                </p>
+                                <p className="ant-upload-hint warn">
                                     申请人须保证上传材料的真实性
                                 </p>
                             </Dragger>
