@@ -291,7 +291,7 @@ class UserAdmin extends PureComponent {
                         onClick={this.noticeAll}
                         loading={this.props.admin.noticeLoading}
                     >
-                        邮件通知所有已申请用户
+                        邮件通知未通过用户
                     </Button>
                     <Button
                         onClick={this.toggleAppStatus}

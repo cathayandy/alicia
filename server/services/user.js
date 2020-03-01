@@ -229,6 +229,7 @@ async function noticeAll(ctx) {
             lastUpdated: {
                 [Sequelize.Op.ne]: null,
             },
+            passed: false,
         },
         attributes: [
             'email', 'passed', 'review',
@@ -245,12 +246,12 @@ async function noticeAll(ctx) {
             sendMail(mailOptions, 'notice');
         } else {
             const hint = review ?
-                `原因为：${reviewMap[review] || review}` : '';
+                `，原因为：${reviewMap[review] || review}` : '';
             const mailOptions = {
                 from: config.smtp.from,
                 to: email,
                 subject: '免修申请结果',
-                html: `抱歉，您的免修申请未通过。${hint}`,
+                html: `抱歉，您的免修申请未通过${hint}。如有疑问，请联系老师。（注：请以网络学堂公布名单为准）`,
             };
             sendMail(mailOptions, 'notice');
         }
