@@ -261,9 +261,12 @@ export default {
                     const pagination = yield select(
                         state => state.admin.pagination
                     );
+                    const filteredValue = yield select(
+                        state => state.admin.filteredValue
+                    );
                     yield put({
                         type: 'getUserList',
-                        payload: { pagination },
+                        payload: { pagination, filteredValue },
                     });
                 } else if (err) {
                     console.error(err);
@@ -298,9 +301,12 @@ export default {
                     const pagination = yield select(
                         state => state.admin.pagination
                     );
+                    const filteredValue = yield select(
+                        state => state.admin.filteredValue
+                    );
                     yield put({
                         type: 'getUserList',
-                        payload: { pagination },
+                        payload: { pagination, filteredValue },
                     });
                 } else if (err) {
                     console.error(err);
@@ -327,9 +333,12 @@ export default {
                     const pagination = yield select(
                         state => state.admin.pagination
                     );
+                    const filteredValue = yield select(
+                        state => state.admin.filteredValue
+                    );
                     yield put({
                         type: 'getUserList',
-                        payload: { pagination },
+                        payload: { pagination, filteredValue },
                     });
                 } else if (err) {
                     console.error(err);
@@ -358,9 +367,12 @@ export default {
                     const pagination = yield select(
                         state => state.admin.pagination
                     );
+                    const filteredValue = yield select(
+                        state => state.admin.filteredValue
+                    );
                     yield put({
                         type: 'getUserList',
-                        payload: { pagination },
+                        payload: { pagination, filteredValue },
                     });
                 } else if (err) {
                     console.error(err);
