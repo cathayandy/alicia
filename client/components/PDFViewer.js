@@ -19,7 +19,7 @@ export default class PDFViewer extends PureComponent {
             });
         }).catch(err => {
             this.setState({ err });
-            console.log(err);
+            console.error(err);
         });
     }
     componentDidUpdate() {

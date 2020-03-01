@@ -48,7 +48,6 @@ class Application extends PureComponent {
         }
     }
     checkFile(file, _fileList) {
-        console.log(file);
         if (!file.type.startsWith('image/') &&
             file.type !== 'application/pdf') {
             return false;

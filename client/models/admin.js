@@ -117,12 +117,19 @@ async function closeApplication() {
     });
 }
 
-async function getUserList({ pagination: { pageSize=10, current=0 }}) {
+async function getUserList({
+    pagination: { pageSize=10, current=0 },
+    filteredValue: { passed=null },
+}) {
     const adminId = localStorage.getItem('id');
     if (!adminId) {
         return Promise.reject('Not login');
     }
-    return request(`/api/users?size=${pageSize}&page=${current}`);
+    let url = `/api/users?size=${pageSize}&page=${current}`;
+    if (Array.isArray(passed) && passed.length === 1) {
+        url += `&passed=${passed[0]}`;
+    }
+    return request(url);
 }
 
 export default {
@@ -139,28 +146,46 @@ export default {
             pageSize: 10,
             current: 1,
         },
+        filteredValue: {},
         selected: new Set(),
     },
     subscriptions: {
         setupHistory({ dispatch, history }) {
             history.listen(({ search }) => {
                 let current = 1;
+                let passed = null;
                 if (search.length > 0) {
                     const arr = search.split('?');
                     if (arr.length > 1) {
                         const q = arr[1].split('&').map(q => q.split('='));
-                        const [_, p] = q.find(([k, _v]) => k === 'page');
-                        current = +p;
+                        const pageQuery = q.find(([k, _v]) => k === 'page');
+                        if (pageQuery) {
+                            current = +pageQuery[1];
+                        }
+                        const passedQuery = q.find(([k, _v]) => k === 'passed');
+                        if (passedQuery) {
+                            if (passedQuery[1] === 'true')
+                                passed = true;
+                            else if (passedQuery[1] === 'false')
+                                passed = false;
+                        }
                     }
+                }
+                const payload = {
+                    pagination: {
+                        pageSize: 10,
+                        current,
+                    },
+                    filteredValue: {},
+                };
+                if (passed !== null) {
+                    payload.filteredValue = {
+                        passed: [passed],
+                    };
                 }
                 dispatch({
                     type: 'getUserList',
-                    payload: {
-                        pagination: {
-                            pageSize: 10,
-                            current,
-                        },
-                    },
+                    payload,
                 });
                 dispatch({
                     type: 'getAppStatus',
@@ -204,6 +229,9 @@ export default {
                                 ...payload.pagination,
                                 total: data.result.total,
                             },
+                            filteredValue: {
+                                ...payload.filteredValue,
+                            }
                         },
                     });
                 } else if (err) {

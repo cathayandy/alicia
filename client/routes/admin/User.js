@@ -48,6 +48,13 @@ const columns = [{
     key: 'passed',
     dataIndex: 'passed',
     title: '是否通过',
+    filters: [{
+        text: '通过',
+        value: true,
+    }, {
+        text: '未通过',
+        value: false,
+    }],
     render: (_text, record) => {
         return record.passed ? '是' : '否';
     }
@@ -191,9 +198,13 @@ class UserAdmin extends PureComponent {
             });
         }
     }
-    onChange(pagination) {
+    onChange(pagination, filters) {
+        let cond = '';
+        if (filters.passed && filters.passed.length === 1) {
+            cond += `&passed=${filters.passed[0]}`;
+        }
         this.props.dispatch(
-            routerRedux.push(`/admin/user?page=${pagination.current}`
+            routerRedux.push(`/admin/user?page=${pagination.current}${cond}`
         ));
     }
     render() {
@@ -210,6 +221,7 @@ class UserAdmin extends PureComponent {
                 />
             );
         };
+        columns[8].filteredValue = this.props.admin.filteredValue.passed;
         const options = Object.keys(reviewMap).map(
             k => <Option key={k} value={k}>{ reviewMap[k] }</Option>
         );

@@ -4,7 +4,13 @@ const { sendMail } = require('../lib/smtp');
 const { User, Student } = require('../models');
 
 async function getList(ctx) {
-    const { page=1, size=10 } = ctx.request.query;
+    const { page=1, size=10, passed=null } = ctx.request.query;
+    const cond = {};
+    if (passed === 'true') {
+        cond.passed = true;
+    } else if (passed === 'false') {
+        cond.passed = false;
+    }
     const { rows, count } = await User.findAndCountAll({
         offset: (page - 1) * +size,
         limit: +size,
@@ -15,6 +21,7 @@ async function getList(ctx) {
         ],
         where: {
             cert: { [Sequelize.Op.ne]: null },
+            ...cond,
         },
     });
     ctx.body = {
