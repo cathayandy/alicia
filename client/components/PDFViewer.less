@@ -1,0 +1,30 @@
+#pdf-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+}
+#pdf-container:focus {
+    outline: 0;
+}
+#pdf-pagination {
+    float: left;
+    position: relative;
+    top: 0;
+    left: 50%;
+    z-index: 99;
+    .ant-pagination {
+        background: white;
+        position: relative;
+        left: -50%; 
+    }
+}
+#pdf-canvas {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}

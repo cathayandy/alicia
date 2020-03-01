@@ -3,6 +3,7 @@ import { Table, Modal, Icon, Switch, Button, Select } from 'antd';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import Admin from './Wrapper';
+import PDFViewer from '../../components/PDFViewer';
 import { reviewMap, certTypeMap } from '../../utils';
 
 const Option = Select.Option;
@@ -75,7 +76,7 @@ class UserAdmin extends PureComponent {
     openModal(record) {
         return () => Modal.confirm({
             title: `免修凭证 - ${record.id}`,
-            content: <img style={{ width: '100%' }} src={`/${record.cert}`}/>,
+            content: <PDFViewer src={`/${record.cert}`}/>,
             okText: '通过',
             cancelText: '返回',
             onOk: () => this.permit(record)(true),

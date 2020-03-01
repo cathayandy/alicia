@@ -43,6 +43,7 @@
     "mysql2": "^2.0.0",
     "node-windows": "^0.1.14",
     "nodemailer": "^6.4.2",
+    "pdfjs-dist": "^2.2.228",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "sequelize": "^5.21.2"

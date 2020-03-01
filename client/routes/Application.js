@@ -33,6 +33,7 @@ class Application extends PureComponent {
         this.normFile = this.normFile.bind(this);
         this.onCertChange = this.onCertChange.bind(this);
         this.validateScore = this.validateScore.bind(this);
+        this.checkFile = this.checkFile.bind(this);
     }
     componentWillReceiveProps(props) {
         if (props.user.info.cert &&
@@ -44,6 +45,13 @@ class Application extends PureComponent {
                 type: 'image/*',
                 url: `/${props.user.info.cert}`,
             }]});
+        }
+    }
+    checkFile(file, _fileList) {
+        console.log(file);
+        if (!file.type.startsWith('image/') &&
+            file.type !== 'application/pdf') {
+            return false;
         }
     }
     validateScore(_rule, value, callback) {
@@ -232,6 +240,7 @@ class Application extends PureComponent {
                                 headers={headers}
                                 fileList={this.state.fileList}
                                 onChange={this.onCertChange}
+                                beforeUpload={this.checkFile}
                             >
                                 <p className="ant-upload-drag-icon">
                                     <Icon type="inbox" />
