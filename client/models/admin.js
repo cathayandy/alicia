@@ -229,9 +229,7 @@ export default {
                                 ...payload.pagination,
                                 total: data.result.total,
                             },
-                            filteredValue: {
-                                ...payload.filteredValue,
-                            }
+                            filteredValue: payload.filteredValue,
                         },
                     });
                 } else if (err) {

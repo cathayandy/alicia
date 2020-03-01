@@ -221,7 +221,7 @@ class UserAdmin extends PureComponent {
                 />
             );
         };
-        columns[8].filteredValue = this.props.admin.filteredValue.passed;
+        columns[8].filteredValue = this.props.admin.filteredValue.passed || [];
         const options = Object.keys(reviewMap).map(
             k => <Option key={k} value={k}>{ reviewMap[k] }</Option>
         );
